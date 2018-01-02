@@ -34,5 +34,3 @@ function socket_command(applet)
 end
 
 core.register_service("socket_command", "http", socket_command)
-
--- stats.add("local", "socket:///var/run/haproxy.sock")
