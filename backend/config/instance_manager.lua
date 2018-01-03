@@ -23,6 +23,8 @@ function get_metadata(applet)
 end
 
 function instance_manager(applet)
+	applet:add_header("Access-Control-Allow-Origin", "*")
+
 	if applet.method == "POST" and applet.length > 0 and applet.path == "/manage" then
 		local command = applet:receive()
 		local results = run_command(command)
@@ -40,9 +42,8 @@ function instance_manager(applet)
 	elseif applet.method == "GET" and applet.path == "/metadata" then
 		applet:set_status(200)
 		results = get_metadata(applet)
-		applet:start_response()
-		applet:add_header("Content-Type", "text/plain")
 		applet:add_header("Content-Length", string.len(results))
+		applet:start_response()
 		applet:send(results)
 	else
 		applet:set_status(404)

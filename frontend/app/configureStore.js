@@ -8,10 +8,6 @@ import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import createReducer from './reducers';
 
-import { Server } from './models/Server.ts';
-
-const s = new Server('', '', '');
-
 const sagaMiddleware = createSagaMiddleware();
 
 export default function configureStore(initialState = {}, history) {

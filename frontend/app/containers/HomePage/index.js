@@ -13,6 +13,14 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 
+// this doesn't belong here, but it does generally demonstrate that this works..
+import Server from '../../models/Server.ts';
+let s = new Server('http://localhost:10000', null, null, "Local!");
+s.Frontends()
+  .then(f => console.log(f))
+  .catch(e => console.log(e));
+
+
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
