@@ -20,6 +20,11 @@ module.exports = (options) => ({
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.js$/, // Transform all .js files required somewhere with Babel
         exclude: /node_modules/,
         use: {
@@ -101,6 +106,8 @@ module.exports = (options) => ({
   resolve: {
     modules: ['app', 'node_modules'],
     extensions: [
+      '.ts',
+      '.tsx',
       '.js',
       '.jsx',
       '.react.js',
