@@ -1,7 +1,6 @@
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosBasicCredentials } from 'axios';
 import * as papaparse from 'papaparse';
 
-
 function groupBy<T>(elements:T[], keySelector:((t:T)=>string)): object {
     let retval = {}
     elements.forEach(f => {
@@ -32,17 +31,20 @@ export class HAProxyInstance {
         this.display_name = display_name || url;
     }
 
+    async SendCommand(command: string): Promise<string>{
+        let results = await <Promise<AxiosResponse<string>>>Axios.post('manage', command, this.config);
+        return results.data;
+    }
 
     async Proxies(): Promise<Proxy[]> {
         try {
-            let results = await <Promise<AxiosResponse<string>>>Axios.post('manage', "show stat", this.config);
-            let responses = papaparse
-                .parse(results.data, { comments: "#", dynamicTyping: true, skipEmptyLines: true }).data;
+            let responses = papaparse.parse(await this.SendCommand('show stat'),
+                    { comments: "#", dynamicTyping: true, skipEmptyLines: true }).data;
             
             var groups = groupBy(responses, f => f[0]);
             var retval: Proxy[] = [];
             for (let i in groups) {
-                retval.push(new Proxy(this, i, (<any[]>groups[i]).map(r=> ProxyComponent.parse(r)) ));
+                retval.push(new Proxy(this, i, (<any[]>groups[i]).map(r=> ProxyComponent.parse(this, r)) ));
             }
             return retval;
         }
@@ -70,7 +72,7 @@ class ProxyComponent {
     */
     static KNOWN_HAPROXY_FIELDS:number = 83;
 
-    static parse(stats: any[]): ProxyComponent {
+    static parse(haproxyInstance:HAProxyInstance, stats: any[]): ProxyComponent {
         let retval: ProxyComponent;
         switch (stats[1]) {
             case "BACKEND":
@@ -86,10 +88,11 @@ class ProxyComponent {
         // need to check for a value first.
         while (stats.length < ProxyComponent.KNOWN_HAPROXY_FIELDS) { stats.push(null); }
         retval.stats = stats;
-        
+        retval.haproxyInstance = haproxyInstance;
         return retval;
     }
     protected stats: any[];
+    protected haproxyInstance: HAProxyInstance;
     get component_type() { return ProxyComponentType.unknown; }
     get proxy_name(): string { return this.stats[0]; }
     get service_name(): string { return this.stats[1]; }
@@ -118,8 +121,8 @@ class ProxyComponent {
 
 export class Proxy {
     private components: ProxyComponent[] = [];
+    private haproxyInstance: HAProxyInstance;
     name: string;
-    haproxyInstance: HAProxyInstance;
     backend: Backend
     frontend: Frontend
     private _servers: Server[] = [];
@@ -152,7 +155,8 @@ export class Frontend extends ProxyComponent {
     get compressed_response_count():number { return this.stats[54];}
     get connection_rate():number { return this.stats[77];}
     get connection_rate_max():number { return this.stats[78];}
-    get connection_total():number { return this.stats[79];}
+    get connection_total(): number { return this.stats[79]; }
+    get intercepted_requests():number { return this.stats[80];}
     get denied_tcp_connections():number { return this.stats[81];}
     get denied_tcp_sessions():number { return this.stats[82];}
 }
@@ -165,7 +169,7 @@ export class Backend extends ProxyComponent {
     get response_errors(): number { return this.stats[14]; }
     get connection_retry_count():number { return this.stats[15];}
     get request_redispatch_count(): number { return this.stats[16]; }
-    get weight():number { return this.stats[18];}
+    get total_weight():number { return this.stats[18];}
     get active_servers():number { return this.stats[19];}
     get backup_servers():number { return this.stats[20];}
     get health_check_transitions():number { return this.stats[22];}
@@ -186,7 +190,7 @@ export class Backend extends ProxyComponent {
     get average_total_session_time():number { return this.stats[61];}
     get cookie(): string { return this.stats[74]; }
     get load_balancing_algorithm():string { return this.stats[76];}
-    get intercepted():number { return this.stats[80];}
+    get intercepted_requests():number { return this.stats[80];}
 }
 
 export class Server extends ProxyComponent{
@@ -197,8 +201,8 @@ export class Server extends ProxyComponent{
     get connection_retry_count():number { return this.stats[15];}
     get request_redispatch_count():number { return this.stats[16];}
     get weight():number { return this.stats[18];}
-    get active_servers():number { return this.stats[19];}
-    get backup_servers():number { return this.stats[20];}
+    get is_active():boolean { return this.stats[19];}
+    get is_backup():boolean { return this.stats[20];}
     get failed_checks():number { return this.stats[21];}
     get health_check_transitions():number { return this.stats[22];}
     get last_status_change():number { return this.stats[23];}
@@ -233,5 +237,49 @@ export class Server extends ProxyComponent{
     get agent_fall():number { return this.stats[71];}
     get agent_health():number { return this.stats[72];}
     get address():string { return this.stats[73];}
-    get cookie():string { return this.stats[74];}
+    get cookie(): string { return this.stats[74]; }
+    
+    get full_server_name(): string { return `${this.proxy_name}/${this.service_name}`; }
+
+    get has_pending_weight_change(): boolean {
+        return Server.pendingOps.weight[this.full_server_name] > 0;
+    }
+    
+    get has_pending_status_change(): boolean {
+        return Server.pendingOps.status[this.full_server_name] > 0;
+    }
+
+    async SetStatus(status: string): Promise<void>{
+        let name = this.full_server_name;
+        try {
+            status = ["maint", "drain", "ready"]
+                .find(k => status.trim().toLowerCase() == k);
+            if (status) {
+                Server.pendingOps.status[name] |= 0;
+                Server.pendingOps.status[name]++;
+                await this.haproxyInstance.SendCommand(`set server ${name} state ${status}`);
+            }    
+        } catch{
+            throw new Error("Unable to set the status for the server at this time, please try again later.");
+        } finally {
+            Server.pendingOps.status[name]--;
+        }
+    }
+
+    async SetWeight(weight: number): Promise<void> {
+        let name = this.full_server_name;
+        try {
+            if (weight >= 0 && weight <= 256) {
+                Server.pendingOps.weight[name] |= 0;
+                Server.pendingOps.weight[name]++;
+                await this.haproxyInstance.SendCommand(`set server ${name} weight ${weight}`);
+            }
+        } catch{
+            throw new Error("Unable to set the weight for the server at this time, please try again later.");
+        } finally {
+            Server.pendingOps.weight[name]--;
+        }
+    };
+
+    private static pendingOps = { status: {}, weight : { }}
 }

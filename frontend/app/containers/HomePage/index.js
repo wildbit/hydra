@@ -17,7 +17,7 @@ import Switch from 'components/Switch';
 import { HAProxyInstance } from '../../models/HAProxy.ts';
 let s = new HAProxyInstance('http://localhost:10000', null, null, "Local!");
 s.Proxies()
-  .then(f => console.log(f))
+  .then(f => { console.log(f) })
   .catch(e => console.log(e));
 
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
