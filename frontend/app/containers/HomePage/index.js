@@ -14,9 +14,9 @@ import Slider from 'components/Slider';
 import Switch from 'components/Switch';
 
 // this doesn't belong here, but it does generally demonstrate that this works..
-import Server from '../../models/Server.ts';
-let s = new Server('http://localhost:10000', null, null, "Local!");
-s.Frontends()
+import { HAProxyInstance } from '../../models/HAProxy.ts';
+let s = new HAProxyInstance('http://localhost:10000', null, null, "Local!");
+s.Proxies()
   .then(f => console.log(f))
   .catch(e => console.log(e));
 
