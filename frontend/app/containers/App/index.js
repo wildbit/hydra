@@ -14,16 +14,17 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
+import Layout from 'containers/Layout';
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 
 export default function App() {
   return (
-    <div>
+    <Layout>
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route component={NotFoundPage} />
       </Switch>
-    </div>
+    </Layout>
   );
 }

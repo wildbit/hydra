@@ -10,8 +10,8 @@
  */
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
+import Slider from 'components/Slider';
+import Switch from 'components/Switch';
 
 // this doesn't belong here, but it does generally demonstrate that this works..
 import Server from '../../models/Server.ts';
@@ -20,13 +20,38 @@ s.Frontends()
   .then(f => console.log(f))
   .catch(e => console.log(e));
 
+export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      slider: "100",
+      enabled: false,
+    };
+  }
+
+  updateSlider = (event) => {
+    this.setState({ slider: event.value }, () => {
+       console.log('slider set to', event.value);
+    });
+  }
+
+  updateToggle = (event) => {
+    this.setState({ enabled: event.checked }, () => {
+      console.log('checked set to', event.checked, 'for', event.target);
+    });
+  }
+
   render() {
+    let { slider, enabled } = this.state;
+
     return (
-      <h1>
-        <FormattedMessage {...messages.header} />
-      </h1>
+      <div>
+        <h1>HomePage Component</h1>
+        <Slider value={slider} onChange={this.updateSlider} />
+        <Switch checked={enabled} onChange={this.updateToggle} data-id={"test"} />
+      </div>
     );
   }
 }
