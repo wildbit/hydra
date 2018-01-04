@@ -23,13 +23,15 @@ const enhance = compose(
 const PercentageSlider = enhance(({ value, handleOnChange }) => {
   return (
     <div>
-      <input type="range" min="0" max="100" list="tickmarks" value={value} onChange={handleOnChange} />
+      <input type="range" min="0" max="256" list="tickmarks" value={value} onChange={handleOnChange} />
       <datalist id="tickmarks">
-        <option value="0" label="0%" />
-        <option value="25" />
-        <option value="50" label="50%" />
-        <option value="75" />
-        <option value="100" label="100%" />
+        <option value="0" label="DRAIN" />
+        <option value="20" />
+        <option value="40" />
+        <option value="60" />
+        <option value="80" />
+        <option value="100"/>
+        <option value="256"/>
       </datalist>
     </div>
   );
