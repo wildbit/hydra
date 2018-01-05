@@ -12,26 +12,34 @@ function groupBy<T>(elements:T[], keySelector:((t:T)=>string)): object {
     return retval;
 }
 
+export interface ConnectionSettings extends AxiosBasicCredentials {
+    url: string
+    timeout: number
+    display_name: string
+}
+
 export class HAProxyInstance {
     private config: AxiosRequestConfig;
+    settings: ConnectionSettings
     display_name: string
     
+    get id():string {
+        return `${this.display_name}~${this.settings.url}`
+    }
+
     proxies: Proxy[] = [];
 
-    constructor(url: string, username: string, password: string,
-        timeout: number = 10, display_name: string = null) {
+    constructor(settings: ConnectionSettings) {
+        this.settings = settings;
         this.config = <AxiosRequestConfig> {
-            baseURL: url,
-            timeout: timeout
+            baseURL: settings.url,
+            timeout: settings.timeout || 10
         }
 
-        if (username && password) {
-            this.config.auth = <AxiosBasicCredentials>{
-                username: username,
-                password: password
-            }        
+        if (settings.username && settings.password) {
+            this.config.auth = this.settings;   
         }
-        this.display_name = display_name || url;
+        this.display_name = settings.display_name || settings.url;
 
         //set an interval to pull proxy info.
     }
@@ -264,6 +272,7 @@ export class Server extends ProxyComponent{
                 Server.pendingOps.status[name] |= 0;
                 Server.pendingOps.status[name]++;
                 await this.haproxyInstance.SendCommand(`set server ${name} state ${status}`);
+                Store.instance.TriggerUpdate();
             }    
         } catch{
             throw new Error("Unable to set the status for the server at this time, please try again later.");
