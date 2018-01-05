@@ -1,6 +1,7 @@
 import { HAProxyInstance, ConnectionSettings } from './HAProxy';
 
 type ModelUpdateCallback = (instances: HAProxyInstance[]) => void;
+interface CallbackHandle<T> { handle: any, callback: T };
 
 export default class Store{
     static INSTANCES_KEY = "haproxy-instances-settings";
@@ -9,7 +10,7 @@ export default class Store{
     // This is an in memory listing, connection 
     // info should be kept in localstorage for a real case.
     private instances: HAProxyInstance[] = [];
-    private callbacks: ModelUpdateCallback[] = [];
+    private callbacks: CallbackHandle<ModelUpdateCallback>[] = [];
 
     constructor() {
         let connectionData = localStorage.getItem(Store.INSTANCES_KEY) || "[]"
@@ -42,11 +43,16 @@ export default class Store{
         localStorage.setItem(Store.INSTANCES_KEY, JSON.stringify(all_settings));
     }
 
-    public RegisterListener(callback: ModelUpdateCallback) {
-        this.callbacks.push(callback);
+    public RegisterListener(handle:any, callback: ModelUpdateCallback) {
+        this.callbacks.push({ handle, callback });
+        callback(this.instances);
+    }
+    
+    public UnregisterListener(handle: any) {
+        this.callbacks = this.callbacks.filter(f => f.handle != handle);
     }
 
     public TriggerUpdate() {
-        this.callbacks.forEach(f => f(this.instances));
+        this.callbacks.forEach(f => f.callback(this.instances));
     }
 }

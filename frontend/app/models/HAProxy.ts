@@ -1,16 +1,7 @@
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosBasicCredentials } from 'axios';
 import * as papaparse from 'papaparse';
 import Store from './Store';
-
-function groupBy<T>(elements:T[], keySelector:((t:T)=>string)): object {
-    let retval = {}
-    elements.forEach(f => {
-        let key = keySelector(f);
-        retval[key] = retval[key] || [];
-        retval[key].push(f);
-    });
-    return retval;
-}
+import { groupBy } from './Helpers';
 
 export interface ConnectionSettings extends AxiosBasicCredentials {
     url: string
@@ -49,7 +40,7 @@ export class HAProxyInstance {
         return results.data;
     }
 
-    async Proxies(): Promise<void> {
+    async Proxies(): Promise<Proxy[]> {
         try {
             let responses = papaparse.parse(await this.SendCommand('show stat'),
                     { comments: "#", dynamicTyping: true, skipEmptyLines: true }).data;
@@ -61,6 +52,7 @@ export class HAProxyInstance {
             }
             this.proxies = retval;
             Store.instance.TriggerUpdate();
+            return retval;
         }
         catch (err) {
             throw new Error("Unable to retrieve server info at this time.");

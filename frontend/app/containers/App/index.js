@@ -16,15 +16,15 @@ import { Switch, Route } from 'react-router-dom';
 
 import Layout from 'containers/Layout';
 import HomePage from 'containers/HomePage/Loadable';
+import TsxRoot from 'containers/TsxRoot/index'
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 
 export default function App() {
-  return (
-    <Layout>
+  return (<Layout>
       <Switch>
         <Route exact path="/" component={HomePage} />
+        <Route exact path="/tsx-root" component={TsxRoot} />
         <Route component={NotFoundPage} />
       </Switch>
-    </Layout>
-  );
+    </Layout>);
 }
