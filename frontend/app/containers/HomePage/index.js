@@ -16,6 +16,12 @@ import Proxy from 'components/Proxy';
 import ServerList from 'components/Servers';
 import Server from 'components/Server';
 
+import Store from '../../models/Store.ts'
+
+Store.instance.RegisterListener(instances => {
+  //apply list of haproxy instances as model.
+});
+
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {

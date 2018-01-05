@@ -1,5 +1,6 @@
 import Axios, { AxiosResponse, AxiosRequestConfig, AxiosBasicCredentials } from 'axios';
 import * as papaparse from 'papaparse';
+import Store from './Store';
 
 function groupBy<T>(elements:T[], keySelector:((t:T)=>string)): object {
     let retval = {}
@@ -15,6 +16,8 @@ export class HAProxyInstance {
     private config: AxiosRequestConfig;
     display_name: string
     
+    proxies: Proxy[] = [];
+
     constructor(url: string, username: string, password: string,
         timeout: number = 10, display_name: string = null) {
         this.config = <AxiosRequestConfig> {
@@ -29,6 +32,8 @@ export class HAProxyInstance {
             }        
         }
         this.display_name = display_name || url;
+
+        //set an interval to pull proxy info.
     }
 
     async SendCommand(command: string): Promise<string>{
@@ -36,7 +41,7 @@ export class HAProxyInstance {
         return results.data;
     }
 
-    async Proxies(): Promise<Proxy[]> {
+    async Proxies(): Promise<void> {
         try {
             let responses = papaparse.parse(await this.SendCommand('show stat'),
                     { comments: "#", dynamicTyping: true, skipEmptyLines: true }).data;
@@ -46,7 +51,8 @@ export class HAProxyInstance {
             for (let i in groups) {
                 retval.push(new Proxy(this, i, (<any[]>groups[i]).map(r=> ProxyComponent.parse(this, r)) ));
             }
-            return retval;
+            this.proxies = retval;
+            Store.instance.TriggerUpdate();
         }
         catch (err) {
             throw new Error("Unable to retrieve server info at this time.");
