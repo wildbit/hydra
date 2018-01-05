@@ -1,6 +1,6 @@
 /**
  *
- * Asynchronously loads the component for Servers
+ * Asynchronously loads the component for AssetGroup
  *
  */
 

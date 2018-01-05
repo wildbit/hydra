@@ -6,14 +6,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose, withHandlers, withState } from 'recompose';
-// import styled from 'styled-components';
+import { compose, withHandlers } from 'recompose';
 
 const enhance = compose(
   withHandlers({
     handleOnChange: ({ onChange, checked }) => event => {
-      let { target } = event;
-      onChange({ target, checked: !checked });
+      onChange({ target: event.target });
     }
   }),
 );

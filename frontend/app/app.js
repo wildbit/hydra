@@ -42,6 +42,8 @@ import configureStore from './configureStore';
 import { translationMessages } from './i18n';
 
 // Import CSS reset and Global Styles
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
 import './global-styles';
 
 // Create redux store with history

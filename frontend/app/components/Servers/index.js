@@ -1,47 +1,48 @@
 /**
 *
-* ServerListing
+* Servers
 *
 */
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import { branch, compose, withHandlers, renderComponent } from 'recompose';
 
-const Server = (props) => {
-  const { name } = props;
+// import styled from 'styled-components';
+
+
+const NullServers = () => {
   return (
-    <li>{name}</li>
+    <p>No servers found</p>
   );
 };
 
-const Listing = styled.ul`
-  font-size: large;
-  list-style-type: none;
-  margin: 0;
-  padding: 10px 15px;
-
-  & li {
-   list-style-type: none;
-  }
-`;
-
-Server.propTypes = {
-  name: PropTypes.string
-};
-
-const Servers = (props) => {
-  const { instances } = props;
-
+const Servers = ({ children }) => {
   return (
-    <Listing>
-      {instances.map(instance => <Server key={instance.name} {...instance} />)}
-    </Listing>
+    <table className="table">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Server</th>
+          <th>Weight</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {children}
+      </tbody>
+    </table>
   );
-};
+}
 
 Servers.propTypes = {
-  instances: PropTypes.array
+
 };
 
-export default Servers;
+const enhance = compose(
+  branch(
+    ({ children }) => children.length === 0,
+    renderComponent(NullServers)
+  )
+);
+
+export default enhance(Servers);

@@ -1,26 +1,22 @@
 /**
 *
-* PercentageSlider
+* Slider
 *
 */
 
 import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, withHandlers } from 'recompose';
-// import styled from 'styled-components';
 
 const enhance = compose(
   withHandlers({
     handleOnChange: ({ onChange }) => event => {
-      let { target } = event;
-      let { value } = target;
-
-      onChange({ target, value });
+      onChange({ target: event.target });
     }
   })
 );
 
-const PercentageSlider = enhance(({ value, handleOnChange }) => {
+const Slider = enhance(({ value, handleOnChange }) => {
   return (
     <div>
       <input type="range" min="0" max="256" list="tickmarks" value={value} onChange={handleOnChange} />
@@ -37,9 +33,9 @@ const PercentageSlider = enhance(({ value, handleOnChange }) => {
   );
 });
 
-PercentageSlider.propTypes = {
+Slider.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
 };
 
-export default PercentageSlider;
+export default Slider;
