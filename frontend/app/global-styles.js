@@ -93,11 +93,35 @@ injectGlobal`
   main {
     padding-top: 56px;
     margin-bottom: 0px;
-    height: 100%;
   }
 
   .app-container {
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .instance-details {
+    max-height: 80vh;
+    overflow: auto;
+  }
+
+  .sidebar {
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .sidebar .instances {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: auto;
+    max-height: 70vh;
+    flex-basis: min-content;
+  }
+  
+  .sidebar .controls {
+    padding-top: 5px;
+    badding-bottom: 5px;
+    flex-basis: fit-content;
+    flex-shrink: 0;
   }
 `;

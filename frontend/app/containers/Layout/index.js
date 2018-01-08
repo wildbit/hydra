@@ -58,19 +58,23 @@ export class Layout extends React.Component { // eslint-disable-line react/prefe
         </Header>
         <main role="main" className="container-fluid">
           <div className="row">
-            <Sidebar className="col-md-3">
-              <Instances instances={instances} />
-              <button
-                type="button"
-                className="btn btn-primary btn-lg btn-block"
-                data-toggle="modal"
-                data-target="#create-instance">
-                Add Instance
-              </button>
+            <Sidebar className="col-md-3 sidebar">
+              <div className="instances">
+                <Instances instances={instances} />
+              </div>
+              <div className="controls">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm btn-block"
+                  data-toggle="modal"
+                  data-target="#create-instance">
+                  Add Instance
+                </button>
+              </div>  
             </Sidebar>
-            <View className="col-md-9">
+            <div className="col-md-9 instance-details">
               {this.props.children}
-            </View>
+            </div>
             <CreateInstance id="create-instance" onSubmit={this.handleOnCreateInstance} />
           </div>
         </main>
