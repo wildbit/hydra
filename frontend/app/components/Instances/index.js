@@ -8,40 +8,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const Instance = (props) => {
-  const { name } = props;
+const Instance = ({ name }) => {
   return (
     <li className="list-group-item list-group-item-action">{name}</li>
   );
 };
 
-const Listing = styled.ul`
-  font-size: large;
-  list-style-type: none;
-  margin: 0;
-  padding: 10px 15px;
-
-  & li {
-   list-style-type: none;
-  }
-`;
-
-Instance.propTypes = {
-  name: PropTypes.string
-};
-
-const Instances = (props) => {
-  const { instances } = props;
-
+const Instances = ({ instances }) => {
   return (
-    <Listing className="list-group">
-      {instances.map(instance => <Instance key={instance.name} {...instance} />)}
-    </Listing>
+    <ul className="list-group">
+      {Object.keys(instances).map(instanceId => <Instance key={instanceId} {...instances[instanceId]} />)}
+    </ul>
   );
 };
 
 Instances.propTypes = {
-  instances: PropTypes.array
+  instances: PropTypes.object
 };
 
 export default Instances;
