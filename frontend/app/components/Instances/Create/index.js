@@ -36,7 +36,7 @@ const Create = ({ id, state, handleOnSubmit, handleOnChange }) => {
           </div>
           <div className="form-group">
             <label htmlFor="Password">Password</label>
-            <input type="text" className="form-control" placeholder="12345" data-field="password" value={password} onChange={handleOnChange} />
+            <input type="password" className="form-control" placeholder="12345" data-field="password" value={password} onChange={handleOnChange} />
           </div>
         </Body>
         <Footer>
