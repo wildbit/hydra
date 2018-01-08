@@ -86,4 +86,8 @@ injectGlobal`
   .slider.round:before {
     border-radius: 45px;
   }
+
+  footer {
+    padding-top: 10px;
+  }
 `;

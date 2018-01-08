@@ -52,36 +52,30 @@ export class Layout extends React.Component { // eslint-disable-line react/prefe
         <Header>
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
-              <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Link</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link disabled" href="#">Disabled</a>
+              <a className="nav-link" href="/about">About</a>
             </li>
           </ul>
         </Header>
         <main role="main" className="container">
           <div className="row">
-            <Sidebar>
+            <Sidebar className="col-md-3">
               <Instances instances={instances} />
               <button
                 type="button"
                 className="btn btn-primary btn-lg btn-block"
                 data-toggle="modal"
                 data-target="#create-instance">
-                + HA Proxy Instance
+                Add Instance
               </button>
             </Sidebar>
-            <View>
+            <View className="col-md-9">
               {this.props.children}
             </View>
             <CreateInstance id="create-instance" onSubmit={this.handleOnCreateInstance} />
           </div>
         </main>
-        <footer>
-          test footer
+        <footer className="text-center text-muted small">
+          Wildbit, LLC &copy; { new Date().getFullYear() }
         </footer>
       </div>
     );

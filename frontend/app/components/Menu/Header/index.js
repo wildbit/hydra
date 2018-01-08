@@ -17,7 +17,7 @@ const Header = ({ children }) => {
     <Heading>
       <div className="container">
         <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-          <a href="#" className="navbar-brand">Hydra</a>
+          <a href="/" className="navbar-brand">Hydra</a>
           <button className="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
           </button>
