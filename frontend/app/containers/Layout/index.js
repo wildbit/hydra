@@ -48,7 +48,7 @@ export class Layout extends React.Component { // eslint-disable-line react/prefe
     let { instances } = this.state;
 
     return (
-      <div>
+      <div className="app-container">
         <Header>
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
@@ -56,7 +56,7 @@ export class Layout extends React.Component { // eslint-disable-line react/prefe
             </li>
           </ul>
         </Header>
-        <main role="main" className="container">
+        <main role="main" className="container-fluid">
           <div className="row">
             <Sidebar className="col-md-3">
               <Instances instances={instances} />
@@ -74,9 +74,6 @@ export class Layout extends React.Component { // eslint-disable-line react/prefe
             <CreateInstance id="create-instance" onSubmit={this.handleOnCreateInstance} />
           </div>
         </main>
-        <footer className="text-center text-muted small">
-          Wildbit, LLC &copy; { new Date().getFullYear() }
-        </footer>
       </div>
     );
   }

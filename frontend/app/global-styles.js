@@ -6,7 +6,6 @@ injectGlobal`
   body {
     height: 100%;
     width: 100%;
-
     margin: 0;
     padding: 0;
   }
@@ -21,8 +20,8 @@ injectGlobal`
 
   #app {
     background-color: #fafafa;
-    min-height: 100%;
-    min-width: 100%;
+    height: 100%;
+    width: 100%;
   }
 
   main.container {
@@ -89,5 +88,16 @@ injectGlobal`
 
   footer {
     padding-top: 10px;
+  }
+
+  main {
+    padding-top: 56px;
+    margin-bottom: 0px;
+    height: 100%;
+  }
+
+  .app-container {
+    height: 100%;
+    width: 100%;
   }
 `;
