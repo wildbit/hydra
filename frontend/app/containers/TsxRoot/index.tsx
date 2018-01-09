@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Store from '../../models/Store'
 import { HAProxyInstance } from '../../models/HAProxy';
-import Layout from '../Layout/index'
 import { ICollection } from '../../models/Helpers';
 
 export default class TsxRoot extends

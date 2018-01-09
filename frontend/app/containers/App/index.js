@@ -14,19 +14,17 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import Layout from 'containers/Layout';
-import HomePage from 'containers/HomePage/Loadable';
-import TsxRoot from 'containers/TsxRoot/index';
 import About from 'components/About/index';
+import HomePage from 'containers/HomePage';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 
 export default function App() {
-  return (<Layout>
+  return (
       <Switch>
         <Route exact path="/" component={HomePage} />
-        <Route exact path="/about" component={About} />  
-        <Route exact path="/tsx-root" component={TsxRoot} />
+        <Route exact path="/about" component={About} />
+        <Route path="/:id" component={HomePage} />
         <Route component={NotFoundPage} />
       </Switch>
-    </Layout>);
+  );
 }
