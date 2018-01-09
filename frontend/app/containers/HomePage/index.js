@@ -55,9 +55,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   refresh = () => {
     let { instances, current } = this.state;
-    let currentHAProxy = new HAProxyInstance(current.haProxy);
-
-    currentHAProxy
+    
+    current.haProxy
       .Proxies()
       .then(proxies => {
         current.proxies = this.mapProxiesToState(proxies);
