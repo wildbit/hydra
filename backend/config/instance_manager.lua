@@ -30,8 +30,8 @@ function instance_manager(applet)
 		local results = run_command(command)
 		if results == nil then
 			applet:set_status(404)
-			applet.start_response()
-			applet.send("No results found.")
+			applet:start_response()
+			applet:send("No results found.")
 		else
 			applet:set_status(200)
 			applet:add_header("Content-Length", string.len(results))
