@@ -41,6 +41,7 @@ export default class Store{
     private SaveInstances() {
         var all_settings = this.instances.map(k => k.settings);
         localStorage.setItem(Store.INSTANCES_KEY, JSON.stringify(all_settings));
+        this.TriggerUpdate();
     }
 
     public RegisterListener(handle:any, callback: ModelUpdateCallback) {

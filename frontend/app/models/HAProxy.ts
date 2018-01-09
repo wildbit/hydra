@@ -24,7 +24,7 @@ export class HAProxyInstance {
         this.settings = settings;
         this.config = <AxiosRequestConfig> {
             baseURL: settings.url,
-            timeout: settings.timeout || 10
+            timeout: (settings.timeout || 10) * 1000
         }
 
         if (settings.username && settings.password) {
@@ -55,7 +55,8 @@ export class HAProxyInstance {
             return retval;
         }
         catch (err) {
-            throw new Error("Unable to retrieve server info at this time.");
+            throw err;
+            //throw new Error("Unable to retrieve server info at this time.");
         }
     }
 }
