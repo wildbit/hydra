@@ -10,7 +10,7 @@ import React from 'react';
 
 const Page = ({ children }) => {
   return (
-    <div className="col-sm-9 main">
+    <div className="col-md-9 main instance-details">
       {children}
     </div>
   );
