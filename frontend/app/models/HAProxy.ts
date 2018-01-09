@@ -14,7 +14,7 @@ export class HAProxyInstance {
     settings: ConnectionSettings
     display_name: string
     
-    get id():string {
+    get key():string {
         return `${this.display_name}~${this.settings.url}`
     }
 
@@ -48,7 +48,7 @@ export class HAProxyInstance {
             var groups = groupBy(responses, f => f[0]);
             var retval: Proxy[] = [];
             for (let i in groups) {
-                retval.push(new Proxy(this, i, (<any[]>groups[i]).map(r=> ProxyComponent.parse(this, r)) ));
+                retval.push(new Proxy(this, i, groups[i]));
             }
             this.proxies = retval;
             Store.instance.TriggerUpdate();
@@ -78,27 +78,36 @@ class ProxyComponent {
     */
     static KNOWN_HAPROXY_FIELDS:number = 83;
 
-    static parse(haproxyInstance:HAProxyInstance, stats: any[]): ProxyComponent {
+    static parse(proxy:Proxy, stats: any[]): ProxyComponent {
         let retval: ProxyComponent;
         switch (stats[1]) {
             case "BACKEND":
-                retval = new Backend();
+                retval = new Backend(proxy);
                 break;
             case "FRONTEND":
-                retval = new Frontend();
+                retval = new Frontend(proxy);
                 break;
             default:
-                retval = new Server();
+                retval = new Server(proxy);
         }
         // Extend the stats array so that individual getters don't
         // need to check for a value first.
         while (stats.length < ProxyComponent.KNOWN_HAPROXY_FIELDS) { stats.push(null); }
         retval.stats = stats;
-        retval.haproxyInstance = haproxyInstance;
         return retval;
     }
     protected stats: any[];
-    protected haproxyInstance: HAProxyInstance;
+    haproxyInstance: HAProxyInstance;
+    proxy: Proxy;
+
+    get key() {
+        return `${this.proxy.key}~${this.service_name}`;
+    }
+
+    constructor(proxy: Proxy) {
+        this.proxy = proxy;
+    }
+
     get component_type() { return ProxyComponentType.unknown; }
     get proxy_name(): string { return this.stats[0]; }
     get service_name(): string { return this.stats[1]; }
@@ -135,8 +144,12 @@ export class Proxy {
     get servers(): Server[]{
         return this._servers;
     }
+    get key(): string {
+        return `${this.haproxyInstance.key}~${this.name}`;
+    }
 
-    constructor(haproxy: HAProxyInstance, name: string, components: ProxyComponent[]) {
+    constructor(haproxy: HAProxyInstance, name: string, component_stats: any[]) {
+        let components = component_stats.map(k => ProxyComponent.parse(this, k));
         this.haproxyInstance = haproxy;
         this.name = components[0].proxy_name;
         this.components = components;
@@ -280,6 +293,7 @@ export class Server extends ProxyComponent{
                 Server.pendingOps.weight[name] |= 0;
                 Server.pendingOps.weight[name]++;
                 await this.haproxyInstance.SendCommand(`set server ${name} weight ${weight}`);
+                Store.instance.TriggerUpdate();
             }
         } catch{
             throw new Error("Unable to set the weight for the server at this time, please try again later.");
