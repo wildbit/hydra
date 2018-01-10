@@ -11,14 +11,14 @@ import { Link } from 'react-router-dom';
 const Instance = (i) => {
   let pending = '';
   if (!i.has_loaded) {
-    pending = <span className="spinner"></span>
+    pending = <span className="fa fa-spinner fa-spin text-info"> </span>;
   }
   return (
     <li className="nav-item" >
       <Link className={`nav-link instance-item ${i.isCurrent ? 'disabled' : ''}`} to={`/${i.display_name}`}>
         <span className={`instance-state ${i.is_available ? 'online': 'offline'}`}></span>
         <span>{i.display_name}</span>
-        {pending}
+        &nbsp;{pending}
       </Link>
     </li>
   );
