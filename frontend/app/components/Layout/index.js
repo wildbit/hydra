@@ -12,7 +12,7 @@ import View from 'components/View';
 import Instances from 'components/Instances';
 import CreateInstance from 'components/Instances/Create'
 
-const Layout = ({ children, hideSidebar, instances, onInstanceCreated }) => {
+const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
   return (
     <div>
       <Header>
@@ -25,14 +25,14 @@ const Layout = ({ children, hideSidebar, instances, onInstanceCreated }) => {
       <main role="main" className="container-fluid">
         <div className="row">
           <Sidebar hidden={hideSidebar}>
-            <Instances instances={instances} />
+            <Instances model={ model } />
             <div className="controls">
               <button
                 type="button"
                 className="btn btn-primary btn-lg btn-block"
                 data-toggle="modal"
                 data-target="#create-instance">
-                + HA Proxy Instance
+                + HAProxy Instance
               </button>
             </div>
           </Sidebar>

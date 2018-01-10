@@ -12,14 +12,16 @@ export interface ConnectionSettings extends AxiosBasicCredentials {
 export class HAProxyInstance {
     private config: AxiosRequestConfig;
     settings: ConnectionSettings
-    display_name: string
-    
+    is_available = false;
+    display_name = "default"
+    has_loaded_proxies = false;
+
     get key():string {
         return `${this.display_name}~${this.settings.url}`
     }
 
     proxies: Proxy[] = [];
-
+    private update_interval: any;
     constructor(settings: ConnectionSettings) {
         this.settings = settings;
         this.config = <AxiosRequestConfig> {
@@ -31,13 +33,28 @@ export class HAProxyInstance {
             this.config.auth = this.settings;   
         }
         this.display_name = settings.display_name || settings.url;
+        setInterval(async () => { await this.RefeshData() }, 15000);
+        this.RefeshData();
+    }
 
-        //set an interval to pull proxy info.
+    private async RefeshData(): Promise<void> {
+        try {
+            this.proxies = await this.Proxies();
+            Store.instance.TriggerUpdate();
+        } catch{
+            /* swallow this, the send command will have set appropriate status */
+        }
     }
 
     async SendCommand(command: string): Promise<string>{
-        let results = await <Promise<AxiosResponse<string>>>Axios.post('manage', command, this.config);
-        return results.data;
+        try {
+            let results = await <Promise<AxiosResponse<string>>>Axios.post('manage', command, this.config);
+            this.is_available = true;
+            return results.data;
+        } catch (err) {
+            this.is_available = false;
+            throw err;
+        }
     }
 
     async Proxies(): Promise<Proxy[]> {
@@ -51,6 +68,7 @@ export class HAProxyInstance {
                 retval.push(new Proxy(this, i, groups[i]));
             }
             this.proxies = retval;
+            this.has_loaded_proxies = true;
             Store.instance.TriggerUpdate();
             return retval;
         }

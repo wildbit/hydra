@@ -8,16 +8,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const Instance = ({ current, name }) => {
+const Instance = (i) => {
   return (
-    <li className="list-group-item list-group-item-action"><a href={`/${name}`}>{name}</a></li>
+    <li className="list-group-item list-group-item-action" >
+      <a className={i.isCurrent ? 'text-success' : ''} href={`/${i.display_name}`}><span>{i.display_name}</span></a>
+      { i.has_loaded_proxies ? '' : ' (load pending)' }
+    </li>
   );
 };
 
-const Instances = ({ current, instances }) => {
+const Instances = ({ model }) => {
   return (
     <ul className="list-group">
-      {Object.keys(instances).map(instanceId => <Instance key={instanceId} current={current} {...instances[instanceId]} />)}
+      {model.instances.map(i =>
+        <Instance key={i.key} isCurrent={model.current && model.current.key == i.key}  {...i} />)}
     </ul>
   );
 };

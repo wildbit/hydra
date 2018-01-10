@@ -23,173 +23,87 @@ import Server from 'components/Server';
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = { instances: {}, current: null };
+    this.state = { instances: [], current: null };
   }
 
   componentDidMount() {
-    this.refresher = setInterval(this.refresh, 15000);
-    
-    // Anytime a new instance is added/updated, 
-    // this should tell the interface to re-render stuff.
-    // registering the listener initiates this. 
-    Store.instance.RegisterListener(this, instances => {
-      this.mapFromStore();
+    Store.instance.RegisterListener(this, updatedModels => {
+      var { instances, current } = this.state;
+      instances = updatedModels;
+      current = current || instances[0]
+      this.setState({ instances, current })
     });
   }
 
   componentWillUnmount() {
     Store.instance.UnregisterListener(this);
-    clearInterval(this.refresher);
-  }
-
-  mapFromStore = () => {
-    let { instances, current } = this.state;
-    let { params } = this.props.match;
-
-    Store.instance.List().forEach((haProxy, i) => {
-      let { key, display_name } = haProxy;
-      instances[key] = { name: display_name, haProxy, proxies: {} };
-
-      if (params.key === key || i === 0) {
-        current = instances[key];
-      }
-    });
-
-    this.setState({ instances, current }, () => {
-      this.refresh();
-    });
-  }
-
-  refresh = () => {
-    let { instances, current } = this.state;
-    
-    if (current) {
-      current.haProxy
-        .Proxies()
-        .then(proxies => {
-          current.proxies = this.mapProxiesToState(proxies);
-          this.setState({ current });
-        })
-        .catch(error => {
-          //console.log(`${current.haProxy.display_name} - FETCHING PROXIES FAILED`, error);
-          //current.proxies = {};
-          //this.setState({ current });
-        });
-
-      Object.keys(instances).forEach(id => {
-        if (instances[id] !== current) {
-          let haProxy = instances[id].haProxy;
-
-          haProxy
-            .Proxies()
-            .then(proxies => {
-              instances[id].proxies = this.mapProxiesToState(proxies);
-              this.setState({ instances });
-            })
-            .catch(error => {
-              instances[id].proxies = {};
-              this.setState({ instances });
-              console.log(`${haProxy.display_name} - FETCHING PROXIES FAILED`, error);
-            });
-        }
-      });
-    }
-    else if (Object.keys(instances).length > 0) {
-      let current = instances[Object.keys(instances)[0]]
-      this.setState({ instances, current });
-    }
-  }
-
-  mapProxiesToState = (proxies) => {
-    let proxy = {};
-
-    proxies.forEach(p => {
-      let servers = {};
-
-      p.servers.forEach(s => {
-        servers[s.full_server_name] = {
-          name: s.full_server_name,
-          weight: s.weight,
-          active: s.is_active,
-          self: s
-        }
-      });
-
-      proxy[p.key] = { key: p.key, name: p.name, servers };
-    });
-
-    return proxy;
   }
 
   mapProxyToComponent = (proxy) => {
-    const { servers } = proxy;
-    let serverIds = Object.keys(servers);
     return (
-      <Proxy name={proxy.name} key={proxy.name}>
+      <Proxy name={proxy.name} key={proxy.key}>
         <ServerList>
-          {serverIds.map(server => this.mapServerToComponent({ proxy, server: servers[server] }))}
+          {proxy.servers.map(server => this.mapServerToComponent(server))}
         </ServerList>
       </Proxy>
     )
   }
 
-  mapServerToComponent = ({ proxy, server }) => {
+  mapServerToComponent = (server) => {
     return (
       <Server
-        key={[proxy.key, server.name].join('+')}
+        key={server.key}
         onStatusChanged={this.handleOnStatusChanged}
         onWeightChanged={this.handleOnWeightChanged}
-        proxyId={proxy.key}
-        {...server}
+        server={server}
       />
     );
   }
 
   handleOnInstanceCreated = (instance, callback) => {
-    let newInstance = Store.instance.Add(instance.url, instance.name, instance.username, instance.password);
+    let newInstance = Store.instance
+      .Add(instance.url, instance.name, instance.username, instance.password);
     if (newInstance) {
       callback();
-      
-      this.refresh();
     }
   }
 
   changeWeight = ({ proxyId, serverId, weight }) => {
-    let { current } = this.state;
-    let server = current.proxies[proxyId].servers[serverId].self;
+    // let { current } = this.state;
+    // let server = current.proxies[proxyId].servers[serverId].self;
 
-    server
-      .SetWeight(parseInt(weight))
-      .then(() => {
-        current.proxies[proxyId].servers[serverId].weight = weight;
-      })
-      .catch(error => {
-        console.log(`${serverId} - SET WEIGHT FAILED`, error);
-      });
+    // server
+    //   .SetWeight(parseInt(weight))
+    //   .then(() => {
+    //     current.proxies[proxyId].servers[serverId].weight = weight;
+    //   })
+    //   .catch(error => {
+    //     console.log(`${serverId} - SET WEIGHT FAILED`, error);
+    //   });
 
-    this.setState({ current }, () => {
-      console.log(`${serverId} weight changed to ${weight}`);
-    })
+    // this.setState({ current }, () => {
+    //   console.log(`${serverId} weight changed to ${weight}`);
+    // })
   }
 
   handleOnWeightChanged = (event) => {
-    let $server = $(event.target).parents('tr');
+    // let $server = $(event.target).parents('tr');
 
-    this.changeWeight({
-      proxyId: $server.data('proxy-id'),
-      serverId: $server.data('server-id'),
-      weight: event.target.value
-    });
+    // this.changeWeight({
+    //   proxyId: $server.data('proxy-id'),
+    //   serverId: $server.data('server-id'),
+    //   weight: event.target.value
+    // });
   }
 
   handleOnStatusChanged = (event) => {
-    let $server = $(event.target).parents('tr');
+    // let $server = $(event.target).parents('tr');
 
-    this.changeWeight({
-      proxyId: $server.data('proxy-id'),
-      serverId: $server.data('server-id'),
-      weight: event.target.checked ? '100' : '0'
-    });
+    // this.changeWeight({
+    //   proxyId: $server.data('proxy-id'),
+    //   serverId: $server.data('server-id'),
+    //   weight: event.target.checked ? '100' : '0'
+    // });
   }
 
   render() {
@@ -197,17 +111,16 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     
     if (!current) {
       return (
-        <Layout instances={instances} onInstanceCreated={this.handleOnInstanceCreated}>
-          <p>No proxies found</p>
+        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+          <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
         </Layout>
       );
     }
 
     else {
-      let proxyIds = Object.keys(current.proxies);
       return (
-        <Layout instances={instances} onInstanceCreated={this.handleOnInstanceCreated}>
-          {proxyIds.map(id => this.mapProxyToComponent(current.proxies[id]))}
+        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+          {current.proxies.map(proxy => this.mapProxyToComponent(proxy)) }
         </Layout>
       );
     }  
