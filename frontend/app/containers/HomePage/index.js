@@ -18,6 +18,7 @@ import Layout from 'components/Layout';
 import Proxy from 'components/Proxy';
 import ServerList from 'components/Servers';
 import Server from 'components/Server';
+import { Icon } from 'components/Icon';
 
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -105,6 +106,17 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     // });
   }
 
+  renderStatusIcon = () => {
+    let status = this.state.current.is_available ? 'Online' : 'Offline';
+    return (
+      <span className={`instance-state-label ${status.toLowerCase()}`}>
+        <Icon className={`instance-state instance-state--title ${status.toLowerCase()}`}
+              name="circle" />
+        {status}
+     </span>
+    )
+  }
+
   render() {
     if (!this.state.current) {
       return (
@@ -117,7 +129,10 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     else {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
-          <h2>{this.state.current.display_name}</h2>
+          <h2>
+            <span>{this.state.current.display_name}</span>
+            {this.renderStatusIcon()}
+          </h2>
           { this.state.current.proxies.map((proxy) => this.mapProxyToComponent(proxy)) }
         </Layout>
       );

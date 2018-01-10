@@ -115,13 +115,20 @@ injectGlobal`
     color: #007bff;
     background-color: #FFF;
   }
+  .instance-state-label {
+    font-size: 15px;
+    margin-left: 15px;
+    vertical-align: 4px;
+  }
   .instance-state {
     font-size: 14px;
     margin-right: 8px;
   }
+  .instance-state-label.online,
   .instance-state.online {
     color: #4bd496;
   }
+  .instance-state-label.offline,
   .instance-state.offline {
     color: #fe6e43;
   }
