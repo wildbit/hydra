@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const Instance = (i) => {
   let indicator = <span>&nbsp;</span>;
@@ -15,7 +16,7 @@ const Instance = (i) => {
   return (
     <li className="list-group-item list-group-item-action" >
       {indicator}
-      <a className={i.isCurrent ? 'text-success' : ''} href={`/${i.display_name}`}><span>{i.display_name}</span></a>{i.has_loaded ? '' : ' (pending)'}
+      <Link className={i.isCurrent ? 'text-success' : ''} href={`/${i.display_name}`}><span>{i.display_name}</span></Link>{i.has_loaded ? '' : ' (pending)'}
     </li>
   );
 };

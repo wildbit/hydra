@@ -10,6 +10,7 @@ import Sidebar from 'components/Menu/Sidebar';
 import View from 'components/View';
 import Instances from 'components/Instances';
 import CreateInstance from 'components/Instances/Create'
+import { Link } from 'react-router-dom';
 
 const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
   return (
@@ -17,7 +18,7 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
       <Header>
         <ul className="navbar-nav mr-auto">
           <li className="nav-item active">
-              <a className="nav-link" href="/about">About</a>
+            <Link className="nav-link" href="/about">About</Link>
           </li>
         </ul>
       </Header>
