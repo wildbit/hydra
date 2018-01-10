@@ -7,11 +7,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { Icon } from '../Icon';
 
 const Instance = (i) => {
   let pending = '';
   if (!i.has_loaded) {
-    pending = <span className="fa fa-spinner fa-spin text-info"> </span>;
+    pending = <Icon className="text-primary" name="circle-o-notch" spin />;
   }
   return (
     <li className="nav-item" >
