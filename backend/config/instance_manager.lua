@@ -38,9 +38,9 @@ end
 function find_server(lookup)
 	for _,p in pairs(core.proxies) do
 		local pxs = p:get_stats()
-		if pxs.pxname == lookup.pxname then
+		if pxs.iid == lookup.iid then
 			 for _, s in pairs(p.servers) do
-				 if s:get_stats().svname == lookup.svname then
+				 if s:get_stats().sid == lookup.sid then
 		 			return s
 		 		end
 		 	end
