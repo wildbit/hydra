@@ -6,21 +6,28 @@
 
 import React from 'react';
 import { branch, compose, renderComponent } from 'recompose';
+import styled from 'styled-components';
+import { Icon } from 'components/icon';
 
-// import styled from 'styled-components';
+const BlankState = styled.p`
+  padding: 0 1.5rem 1rem;
+  text-align: center;
+  color: #afb2bb;
+`;
 
 
 const NullServers = () => {
   return (
-    <p>No servers found</p>
+    <BlankState>
+      <Icon name="server" /><br/>No servers found
+    </BlankState>
   );
 };
 
 const Servers = ({ children }) => (
-  <table className="table">
+  <table className="table server-table">
     <thead>
       <tr>
-        <th>Status</th>
         <th>Server</th>
         <th>Weight</th>
         <th></th>

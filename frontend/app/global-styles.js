@@ -2,6 +2,8 @@ import { injectGlobal } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
 injectGlobal`
+  @import url('https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i');
+
   html,
   body {
     height: 100%;
@@ -11,11 +13,7 @@ injectGlobal`
   }
 
   body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-
-  body.fontLoaded {
-    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Karla', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   header {
@@ -25,7 +23,7 @@ injectGlobal`
   }
 
   #app {
-    background-color: #FFF;
+    background-color: #f6f7fb;
   }
 
   main.container {
@@ -39,6 +37,7 @@ injectGlobal`
     display: inline-block;
     width: 50px;
     height: 25px;
+    margin-bottom: 0;
   }
 
   .switch input {display:none;}
@@ -103,7 +102,7 @@ injectGlobal`
   }
   .instance-item {
     border-left: 5px solid transparent;
-    color: #000;
+    color: #333;
     padding-top: 1em;
     padding-bottom: 1em;
     border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -127,14 +126,33 @@ injectGlobal`
     color: #fe6e43;
   }
 
+  .server-table {
+    margin-bottom: 0;
+  }
+  .server-table thead th {
+    border-top: none;
+    color: #afb2bb;
+    border-bottom: 1px solid #F1F2F6;
+    text-transform: uppercase;
+    font-size: 13px;
+    padding: 0 1.5rem .75rem;
+    font-weight: normal;
+  }
+  .server-table td {
+    border-top-color: #F1F2F6;
+    vertical-align: middle;
+    padding: .75rem 1.5rem;
+  }
+
   /* Sidebar */
   .sidebar {
     padding: 0;
     z-index: 1000;
     -webkit-box-ordinal-group: 1;
     order: 0;
-    background-color: #f6f7fb;
-    border-right: 1px solid rgba(0,0,0,0.05);
+    background-color: #FFF;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
+    border-right: 1px solid rgba(0, 0, 0,.07);
   }
 
   .sidebar .instances {

@@ -8,24 +8,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const FieldSet = styled.fieldset`
-  border: 1px groove rgba(0, 0, 0, 0.125);
-  border-radius: 0.15em;
-  padding: 5px 10px;
-
-  & legend {
-    padding: 5px 10px;
-    width: auto;
-  }
+const ProxyContainer = styled.div`
+  border-radius: 5px;
+  margin-bottom: 2em;
+  background-color: #FFF;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0,.07);
 `;
 
+const Title = styled.h4`
+  font-size: 20px;
+  margin: 1.5rem;
+`;
 
 const Proxy = ({ name, children }) => {
   return (
-    <FieldSet>
-      <legend>{name}</legend>
+    <ProxyContainer>
+      <Title>{name}</Title>
       {children}
-    </FieldSet>
+    </ProxyContainer>
   );
 }
 

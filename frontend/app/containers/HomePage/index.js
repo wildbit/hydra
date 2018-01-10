@@ -117,9 +117,10 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     else {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+          <h2>{this.state.current.display_name}</h2>
           { this.state.current.proxies.map((proxy) => this.mapProxyToComponent(proxy)) }
         </Layout>
       );
-    }  
+    }
   }
 }
