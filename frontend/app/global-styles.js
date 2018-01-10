@@ -129,9 +129,7 @@ injectGlobal`
 
   /* Sidebar */
   .sidebar {
-    position: sticky;
     padding: 0;
-    top: 3.5rem;
     z-index: 1000;
     -webkit-box-ordinal-group: 1;
     order: 0;
@@ -152,6 +150,8 @@ injectGlobal`
 
   @media (min-width: 768px) {
     .sidebar {
+      position: sticky;
+      top: 3.5rem;
       height: calc(100vh - 3.5rem);
     }
     .sidebar .instances {
