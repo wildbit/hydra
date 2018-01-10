@@ -21,10 +21,12 @@ const Instance = (i) => {
 };
 
 const Instances = ({ model }) => (
-  <ul className="list-group">
-    {model.instances.map((i) =>
-      <Instance key={i.key} isCurrent={model.current && model.current.key === i.key} {...i} />)}
-  </ul>
+  <div className="instances">
+    <ul className="list-group">
+      {model.instances.map((i) =>
+        <Instance key={i.key} isCurrent={model.current && model.current.key === i.key} {...i} />)}
+    </ul>
+  </div>
 );
 
 Instances.propTypes = {

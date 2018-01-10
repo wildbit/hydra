@@ -22,7 +22,7 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
         </ul>
       </Header>
       <main role="main" className="container-fluid">
-        <div className="row">
+        <div className="row flex-xl-nowrap">
           <Sidebar hidden={hideSidebar}>
             <Instances model={ model } />
             <div className="controls">
@@ -37,13 +37,14 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
           </Sidebar>
           <View>
             {children}
+
+            <footer className="text-muted small text-center">
+              &copy; Wildbit, LLC { new Date().getFullYear() }
+            </footer>
           </View>
           <CreateInstance id="create-instance" onSubmit={onInstanceCreated} />
         </div>
       </main>
-      <footer className="text-muted small text-center">
-        &copy; Wildbit, LLC { new Date().getFullYear() }
-      </footer>
     </div>
   );
 }

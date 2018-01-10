@@ -15,7 +15,7 @@ const NullSidebar = () => {
 
 const Sidebar = ({ children }) => {
   return (
-    <aside className="col-md-3 sidebar">
+    <aside className="sidebar col-12 col-md-3 col-xl-2">
       {children}
     </aside>
   );
