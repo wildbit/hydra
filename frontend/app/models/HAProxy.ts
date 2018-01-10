@@ -36,7 +36,7 @@ export class HAProxyInstance {
 
         setInterval(async () => {
             await this.Proxies();
-        }, 10000)
+        }, 5000)
         this.Proxies();
     }
 
@@ -65,13 +65,24 @@ export class HAProxyInstance {
     async Proxies(): Promise<Proxy[]> {
         try {
             let responses = await this.Query('stats');
-            this.proxies = responses.proxies.map(k => new Proxy(this, k));
+            var currentProxies = {};
+            this.proxies.forEach(k => {
+                currentProxies[k.proxy_id] = k
+            });
+            let newProxies = [];
+            responses.proxies.forEach(k => {
+                var c = currentProxies[k.stats.iid];
+                if (c) { c.UpdateData(k); }
+                else { c = new Proxy(this, k); }
+                newProxies.push(new Proxy(this, k));
+            });
+            this.proxies = newProxies;
             this.has_loaded = true;
             Store.instance.TriggerUpdate();
             return this.proxies;
         }
         catch (err) {
-            throw err;
+            //throw err;
             //throw new Error("Unable to retrieve server info at this time.");
         }
     }
@@ -148,7 +159,6 @@ export class Proxy {
         this.haproxyInstance = haproxy;
         this.stats = apiData.stats;
         this._servers = apiData.servers.map(k => new Server(this, k));
-        //Either of these could be null, but that's OK.
     }
 
     UpdateData(apiData: any) {
@@ -156,7 +166,20 @@ export class Proxy {
         //update servers with new data -- this is ham-fisted,
         // a good version of this would merge the data into existing servers,
         // removing old ones.
-        this._servers = apiData.servers.map(k => new Server(this, k));
+        let allServers = {}
+        this._servers.forEach(s => allServers[s.service_id] = s);
+        let newServers:Server[] = []
+        
+        apiData.servers.forEach(s => {
+            var server = allServers[s.sid];
+            if (server) {
+                server.UpdateData(s);
+            } else {
+                server = new Server(this, s);
+            }
+            newServers.push(server);
+        });
+        this._servers = newServers;
     }
 }
 
