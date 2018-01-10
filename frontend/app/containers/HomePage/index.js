@@ -13,7 +13,6 @@ import React from 'react';
 import $ from 'jquery';
 
 import Store from 'models/Store.ts'
-import { HAProxyInstance } from 'models/HAProxy.ts';
 
 import Layout from 'components/Layout';
 import Proxy from 'components/Proxy';
@@ -27,11 +26,11 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   componentDidMount() {
-    Store.instance.RegisterListener(this, updatedModels => {
-      var { instances, current } = this.state;
+    Store.instance.RegisterListener(this, (updatedModels) => {
+      let { instances, current } = this.state;
       instances = updatedModels;
-      current = current || instances[0]
-      this.setState({ instances, current })
+      current = current || instances[0];
+      this.setState({ instances, current });
     });
   }
 
@@ -107,9 +106,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   render() {
-    let { instances, current } = this.state;
-    
-    if (!current) {
+    if (!this.state.current) {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
           <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
@@ -120,7 +117,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     else {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
-          {current.proxies.map(proxy => this.mapProxyToComponent(proxy)) }
+          { this.state.current.proxies.map((proxy) => this.mapProxyToComponent(proxy)) }
         </Layout>
       );
     }  

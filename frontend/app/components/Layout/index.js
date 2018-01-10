@@ -5,7 +5,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import Header from 'components/Menu/Header';
 import Sidebar from 'components/Menu/Sidebar';
 import View from 'components/View';
@@ -42,14 +41,11 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
           <CreateInstance id="create-instance" onSubmit={onInstanceCreated} />
         </div>
       </main>
-      <footer>
-        test footer
+      <footer className="text-muted small text-center">
+        &copy; Wildbit, LLC { new Date().getFullYear() }
       </footer>
     </div>
   );
 }
-
-Layout.propTypes = {
-};
 
 export default Layout;

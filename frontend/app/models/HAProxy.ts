@@ -12,16 +12,16 @@ export interface ConnectionSettings extends AxiosBasicCredentials {
 export class HAProxyInstance {
     private config: AxiosRequestConfig;
     settings: ConnectionSettings
+    display_name: string
     is_available = false;
-    display_name = "default"
-    has_loaded_proxies = false;
-
+    has_loaded = false;
+    
     get key():string {
         return `${this.display_name}~${this.settings.url}`
     }
 
     proxies: Proxy[] = [];
-    private update_interval: any;
+
     constructor(settings: ConnectionSettings) {
         this.settings = settings;
         this.config = <AxiosRequestConfig> {
@@ -33,44 +33,41 @@ export class HAProxyInstance {
             this.config.auth = this.settings;   
         }
         this.display_name = settings.display_name || settings.url;
-        setInterval(async () => { await this.RefeshData() }, 15000);
-        this.RefeshData();
+
+        setInterval(async () => {
+            await this.Proxies();
+        }, 10000)
+        this.Proxies();
     }
 
-    private async RefeshData(): Promise<void> {
+    async SendCommand(path, payload): Promise<any>{
         try {
-            this.proxies = await this.Proxies();
-            Store.instance.TriggerUpdate();
-        } catch{
-            /* swallow this, the send command will have set appropriate status */
-        }
+            let results = await <Promise<AxiosResponse<any>>>Axios.post(path, payload, this.config);
+            this.is_available = true;
+            return results.data;
+        } catch(err){
+            this.is_available = false;
+            throw err;
+        }    
     }
 
-    async SendCommand(command: string): Promise<string>{
+    async Query(path): Promise<any>{
         try {
-            let results = await <Promise<AxiosResponse<string>>>Axios.post('manage', command, this.config);
+            let results = await <Promise<AxiosResponse<any>>>Axios.get(path, this.config);
             this.is_available = true;
             return results.data;
         } catch (err) {
             this.is_available = false;
-            throw err;
-        }
+        }    
     }
 
     async Proxies(): Promise<Proxy[]> {
         try {
-            let responses = papaparse.parse(await this.SendCommand('show stat'),
-                    { comments: "#", dynamicTyping: true, skipEmptyLines: true }).data;
-            
-            var groups = groupBy(responses, f => f[0]);
-            var retval: Proxy[] = [];
-            for (let i in groups) {
-                retval.push(new Proxy(this, i, groups[i]));
-            }
-            this.proxies = retval;
-            this.has_loaded_proxies = true;
+            let responses = await this.Query('stats');
+            this.proxies = responses.proxies.map(k => new Proxy(this, k));
+            this.has_loaded = true;
             Store.instance.TriggerUpdate();
-            return retval;
+            return this.proxies;
         }
         catch (err) {
             throw err;
@@ -87,217 +84,205 @@ enum ProxyComponentType {
 }
 
 class ProxyComponent {
-    /*
-     This is the count of known HAProxy fields for this version of
-     the UI. Newer versions of HAProxy may add more fields,
-     and we'll add the getters for them as time goes on.
-     Then, we'll increase this constant to reflect knowledge of 
-     those getters. These are outlined, in detail, here: 
-     http://cbonte.github.io/haproxy-dconv/1.8/management.html#9.1
-    */
-    static KNOWN_HAPROXY_FIELDS:number = 83;
 
-    static parse(proxy:Proxy, stats: any[]): ProxyComponent {
-        let retval: ProxyComponent;
-        switch (stats[1]) {
-            case "BACKEND":
-                retval = new Backend(proxy);
-                break;
-            case "FRONTEND":
-                retval = new Frontend(proxy);
-                break;
-            default:
-                retval = new Server(proxy);
-        }
-        // Extend the stats array so that individual getters don't
-        // need to check for a value first.
-        while (stats.length < ProxyComponent.KNOWN_HAPROXY_FIELDS) { stats.push(null); }
-        retval.stats = stats;
-        return retval;
-    }
-    protected stats: any[];
-    haproxyInstance: HAProxyInstance;
+    protected stats: any;
+    get haproxyInstance() { return this.proxy.haproxyInstance; }
     proxy: Proxy;
 
-    get key() {
-        return `${this.proxy.key}~${this.service_name}`;
+    get key() { return `${this.proxy.key}/${this.service_id}`; }
+
+    constructor(proxy: Proxy, stats:any) {
+        this.proxy = proxy;
+        this.stats = stats;
     }
 
-    constructor(proxy: Proxy) {
-        this.proxy = proxy;
+    UpdateData(stats: any) {
+        this.stats = stats;
     }
 
     get component_type() { return ProxyComponentType.unknown; }
-    get proxy_name(): string { return this.stats[0]; }
-    get service_name(): string { return this.stats[1]; }
-    get current_sessions(): number { return this.stats[4]; }
-    get max_sessions():number { return this.stats[5];}
-    get configured_session_limit():number { return this.stats[6];}
-    get total_sessions():number { return this.stats[7];}
-    get bytes_in():number { return this.stats[8];}
-    get bytes_out():number { return this.stats[9];}
-    get denied_responses():number { return this.stats[11];}
-    get connection_errors():number { return this.stats[13];}
-    get status():string { return this.stats[17];} // should use an enum -- probably.
-    get process_id():string { return this.stats[26];}
-    get proxy_id():string { return this.stats[27];}
-    get type():number { return this.stats[32];}
-    get rate():number { return this.stats[33];}
-    get rate_max():number { return this.stats[35];}
-    get http_responses_1xx():number { return this.stats[39];}
-    get http_responses_2xx():number { return this.stats[40];}
-    get http_responses_3xx():number { return this.stats[41];}
-    get http_responses_4xx():number { return this.stats[42];}
-    get http_responses_5xx():number { return this.stats[43];}
-    get http_responses_other():number { return this.stats[44];}
-    get mode():string { return this.stats[75];}
+    get proxy_name(): string { return this.stats.pxname; }
+    get service_name(): string { return this.stats.svname; }
+    get current_sessions(): number { return this.stats.scur; }
+    get max_sessions():number { return this.stats.smax;}
+    get configured_session_limit():number { return this.stats.slim;}
+    get total_sessions():number { return this.stats.stot;}
+    get bytes_in():number { return this.stats.bin;}
+    get bytes_out():number { return this.stats.bout;}
+    get denied_responses():number { return this.stats.dresp;}
+    get connection_errors():number { return this.stats.econ;}
+    get status():string { return this.stats.status;} // should use an enum -- probably.
+    get process_id():string { return this.stats.pid;}
+    get proxy_id(): string { return this.stats.iid; }
+    get service_id(): string { return this.stats.sid; }
+    get type():number { return this.stats.type;}
+    get rate():number { return this.stats.rate;}
+    get rate_max():number { return this.stats.rate_max;}
+    get http_responses_1xx():number { return this.stats.hrsp_1xx;}
+    get http_responses_2xx():number { return this.stats.hrsp_2xx;}
+    get http_responses_3xx():number { return this.stats.hrsp_3xx;}
+    get http_responses_4xx():number { return this.stats.hrsp_4xx;}
+    get http_responses_5xx():number { return this.stats.hrsp_5xx;}
+    get http_responses_other():number { return this.stats.hrsp_other;}
+    get mode():string { return this.stats.mode; }
 }
 
 export class Proxy {
-    private components: ProxyComponent[] = [];
-    private haproxyInstance: HAProxyInstance;
-    name: string;
-    backend: Backend
-    frontend: Frontend
+    private stats:any;
     private _servers: Server[] = [];
+    
+    haproxyInstance: HAProxyInstance;
+
+    get name(): string { return this.stats.pxname; }
+    get proxy_id() { return this.stats.iid; }
+
     get servers(): Server[]{
         return this._servers;
     }
     get key(): string {
-        return `${this.haproxyInstance.key}~${this.name}`;
+        return `${this.haproxyInstance.key}/${this.proxy_id}`;
     }
 
-    constructor(haproxy: HAProxyInstance, name: string, component_stats: any[]) {
-        let components = component_stats.map(k => ProxyComponent.parse(this, k));
+    constructor(haproxy: HAProxyInstance, apiData:any) {
         this.haproxyInstance = haproxy;
-        this.name = components[0].proxy_name;
-        this.components = components;
-        this._servers = <Server[]> components.filter(k => k instanceof Server);
+        this.stats = apiData.stats;
+        this._servers = apiData.servers.map(k => new Server(this, k));
         //Either of these could be null, but that's OK.
-        this.backend = <Backend>components.filter(k => k instanceof Backend).pop();
-        this.frontend = <Frontend>components.filter(k => k instanceof Frontend).pop();
+    }
+
+    UpdateData(apiData: any) {
+        this.stats = apiData.stats;
+        //update servers with new data -- this is ham-fisted,
+        // a good version of this would merge the data into existing servers,
+        // removing old ones.
+        this._servers = apiData.servers.map(k => new Server(this, k));
     }
 }
 
 export class Frontend extends ProxyComponent {
+    
     get component_type() { return ProxyComponentType.frontend; }
-    get denied_requests(): number { return this.stats[10]; }
-    get request_errors(): number { return this.stats[12]; }
-    get rate_limit(): number { return this.stats[34]; }
-    get request_rate():number { return this.stats[46];}
-    get request_rate_max():number { return this.stats[47];}
-    get request_total(): number { return this.stats[48]; }
-    get compressor_bytes_in():number { return this.stats[51];}
-    get compressor_bytes_out():number { return this.stats[52];}
-    get compressor_bytes_bypassed():number { return this.stats[53];}
-    get compressed_response_count():number { return this.stats[54];}
-    get connection_rate():number { return this.stats[77];}
-    get connection_rate_max():number { return this.stats[78];}
-    get connection_total(): number { return this.stats[79]; }
-    get intercepted_requests():number { return this.stats[80];}
-    get denied_tcp_connections():number { return this.stats[81];}
-    get denied_tcp_sessions():number { return this.stats[82];}
+    get denied_requests(): number { return this.stats.dreq; }
+    get request_errors(): number { return this.stats.ereq; }
+    get rate_limit(): number { return this.stats.rate_lim; }
+    get request_rate():number { return this.stats.req_rate;}
+    get request_rate_max():number { return this.stats.req_rate_max;}
+    get request_total(): number { return this.stats.req_tot; }
+    get compressor_bytes_in():number { return this.stats.comp_in;}
+    get compressor_bytes_out():number { return this.stats.comp_out;}
+    get compressor_bytes_bypassed():number { return this.stats.comp_byp;}
+    get compressed_response_count():number { return this.stats.comp_rsp;}
+    get connection_rate():number { return this.stats.conn_rate;}
+    get connection_rate_max():number { return this.stats.conn_rate_max;}
+    get connection_total(): number { return this.stats.conn_tot; }
+    get intercepted_requests():number { return this.stats.intercepted;}
+    get denied_tcp_connections():number { return this.stats.dcon;}
+    get denied_tcp_sessions():number { return this.stats.dses;}
 }
 
 export class Backend extends ProxyComponent {
     get component_type() { return ProxyComponentType.backend; }
-    get current_queued_requests():number { return this.stats[2];}
-    get queued_requests_max(): number { return this.stats[3]; }
-    get denied_requests(): number { return this.stats[10]; }
-    get response_errors(): number { return this.stats[14]; }
-    get connection_retry_count():number { return this.stats[15];}
-    get request_redispatch_count(): number { return this.stats[16]; }
-    get total_weight():number { return this.stats[18];}
-    get active_servers():number { return this.stats[19];}
-    get backup_servers():number { return this.stats[20];}
-    get health_check_transitions():number { return this.stats[22];}
-    get last_status_change():number { return this.stats[23];}
-    get downtime(): number { return this.stats[24]; }
-    get load_balance_total():number { return this.stats[30];}
-    get request_total(): number { return this.stats[48]; }
-    get client_transfers_aborted():number { return this.stats[49];}
-    get server_transfers_aborted(): number { return this.stats[50]; }
-    get compressor_bytes_in():number { return this.stats[51];}
-    get compressor_bytes_out():number { return this.stats[52];}
-    get compressor_bytes_bypassed():number { return this.stats[53];}
-    get compressed_response_count(): number { return this.stats[54]; }
-    get last_session():number { return this.stats[55];}
-    get average_queue_time():number { return this.stats[58];}
-    get average_connect_time():number { return this.stats[59];}
-    get average_response_time():number { return this.stats[60];}
-    get average_total_session_time():number { return this.stats[61];}
-    get cookie(): string { return this.stats[74]; }
-    get load_balancing_algorithm():string { return this.stats[76];}
-    get intercepted_requests():number { return this.stats[80];}
+    get current_queued_requests():number { return this.stats.qcur;}
+    get queued_requests_max(): number { return this.stats.qmax; }
+    get denied_requests(): number { return this.stats.dreq; }
+    get response_errors(): number { return this.stats.ereq; }
+    get connection_retry_count():number { return this.stats.wretr;}
+    get request_redispatch_count(): number { return this.stats.wredis; }
+    get total_weight():number { return this.stats.weight;}
+    get active_servers():number { return this.stats.act;}
+    get backup_servers():number { return this.stats.bck;}
+    get health_check_transitions():number { return this.stats.chkdown;}
+    get last_status_change():number { return this.stats.lastchg;}
+    get downtime(): number { return this.stats.downtime; }
+    get load_balance_total():number { return this.stats.lbtot;}
+    get request_total(): number { return this.stats.req_tot; }
+    get client_transfers_aborted():number { return this.stats.cli_abrt;}
+    get server_transfers_aborted(): number { return this.stats.srv_abrt; }
+    get compressor_bytes_in():number { return this.stats.comp_in;}
+    get compressor_bytes_out():number { return this.stats.comp_out;}
+    get compressor_bytes_bypassed():number { return this.stats.comp_byp;}
+    get compressed_response_count(): number { return this.stats.comp_rsp; }
+    get last_session():number { return this.stats.lastsess;}
+    get average_queue_time():number { return this.stats.qtime;}
+    get average_connect_time():number { return this.stats.ctime;}
+    get average_response_time():number { return this.stats.rtime;}
+    get average_total_session_time():number { return this.stats.ttime;}
+    get cookie(): string { return this.stats.cookie; }
+    get load_balancing_algorithm():string { return this.stats.algo;}
+    get intercepted_requests():number { return this.stats.intercepted;}
 }
 
 export class Server extends ProxyComponent{
     get component_type() { return ProxyComponentType.server; }
-    get current_queued_requests():number { return this.stats[2];}
-    get queued_requests_max(): number { return this.stats[3]; }
-    get response_errors(): number { return this.stats[14]; }
-    get connection_retry_count():number { return this.stats[15];}
-    get request_redispatch_count():number { return this.stats[16];}
-    get weight():number { return this.stats[18];}
-    get is_active():boolean { return this.stats[19];}
-    get is_backup():boolean { return this.stats[20];}
-    get failed_checks():number { return this.stats[21];}
-    get health_check_transitions():number { return this.stats[22];}
-    get last_status_change():number { return this.stats[23];}
-    get downtime():number { return this.stats[24];}
-    get max_queue_per_server(): number { return this.stats[25]; }
-    get server_id():string { return this.stats[28];}
-    get throttle():number { return this.stats[29];}
-    get load_balance_total():number { return this.stats[30];}
-    get tracked(): string { return this.stats[31]; }
-    get check_status(): string { return this.stats[36]; }
-    get check_code():number { return this.stats[37];}
-    get check_duration(): number { return this.stats[38]; }
-    get failed_health_check_details(): string { return this.stats[45]; }
-    get client_transfers_aborted():number { return this.stats[49];}
-    get server_transfers_aborted(): number { return this.stats[50]; }
-    get last_session():number { return this.stats[55];}
-    get last_health_check():number { return this.stats[56];}
-    get last_agent_check():number { return this.stats[57];}
-    get average_queue_time():number { return this.stats[58];}
-    get average_connect_time():number { return this.stats[59];}
-    get average_response_time():number { return this.stats[60];}
-    get average_total_session_time():number { return this.stats[61];}
-    get agent_status(): string { return this.stats[62]; }
-    get agent_code():number { return this.stats[63];}
-    get agent_duration():number { return this.stats[64];}
-    get check_description():string { return this.stats[65];}
-    get agent_description():string { return this.stats[66];}
-    get check_rise():number { return this.stats[67];}
-    get check_fall():number { return this.stats[68];}
-    get check_health():number { return this.stats[69];}
-    get agent_rise():number { return this.stats[70];}
-    get agent_fall():number { return this.stats[71];}
-    get agent_health():number { return this.stats[72];}
-    get address():string { return this.stats[73];}
-    get cookie(): string { return this.stats[74]; }
+    get current_queued_requests():number { return this.stats.qcur;}
+    get queued_requests_max(): number { return this.stats.qmax; }
+    get response_errors(): number { return this.stats.eresp; }
+    get connection_retry_count():number { return this.stats.wretr;}
+    get request_redispatch_count():number { return this.stats.wredis;}
+    get weight():number { return this.stats.weight;}
+    get is_active():boolean { return this.stats.act;}
+    get is_backup():boolean { return this.stats.bck;}
+    get failed_checks():number { return this.stats.chkfail;}
+    get health_check_transitions():number { return this.stats.chkdown;}
+    get last_status_change():number { return this.stats.lastchg;}
+    get downtime():number { return this.stats.downtime;}
+    get max_queue_per_server(): number { return this.stats.qlimit; }
+    get server_id():string { return this.stats.sid;}
+    get throttle():number { return this.stats.throttle;}
+    get load_balance_total():number { return this.stats.lbtot;}
+    get tracked(): string { return this.stats.tracked; }
+    get check_status(): string { return this.stats.check_status; }
+    get check_code():number { return this.stats.check_code;}
+    get check_duration(): number { return this.stats.check_duration; }
+    get failed_health_check_details(): string { return this.stats.hanafail; }
+    get client_transfers_aborted():number { return this.stats.cli_abrt;}
+    get server_transfers_aborted(): number { return this.stats.srv_abrt; }
+    get last_session():number { return this.stats.lastsess;}
+    get last_health_check():number { return this.stats.last_chk;}
+    get last_agent_check():number { return this.stats.last_agt;}
+    get average_queue_time():number { return this.stats.qtime;}
+    get average_connect_time():number { return this.stats.ctime;}
+    get average_response_time():number { return this.stats.rtime;}
+    get average_total_session_time():number { return this.stats.ttime;}
+    get agent_status(): string { return this.stats.agent_status; }
+    get agent_code():number { return this.stats.agent_code;}
+    get agent_duration():number { return this.stats.agent_duration;}
+    get check_description():string { return this.stats.check_desc;}
+    get agent_description():string { return this.stats.agent_desc;}
+    get check_rise():number { return this.stats.check_rise;}
+    get check_fall():number { return this.stats.check_fall;}
+    get check_health():number { return this.stats.check_health;}
+    get agent_rise():number { return this.stats.agent_rise;}
+    get agent_fall():number { return this.stats.agent_fall;}
+    get agent_health():number { return this.stats.agent_health;}
+    get address():string { return this.stats.addr;}
+    get cookie(): string { return this.stats.cookie; }
     
-    get full_server_name(): string { return `${this.proxy_name}/${this.service_name}`; }
+    private get server_identifier(): string { return `${this.proxy_id}/${this.service_id}`; }
 
     get has_pending_weight_change(): boolean {
-        return Server.pendingOps.weight[this.full_server_name] > 0;
+        return Server.pendingOps.weight[this.server_identifier] > 0;
     }
     
     get has_pending_status_change(): boolean {
-        return Server.pendingOps.status[this.full_server_name] > 0;
+        return Server.pendingOps.status[this.server_identifier] > 0;
     }
 
     async SetStatus(status: string): Promise<void>{
-        let name = this.full_server_name;
+        let name = this.server_identifier;
         try {
             status = ["maint", "drain", "ready"]
                 .find(k => status.trim().toLowerCase() == k);
             if (status) {
                 Server.pendingOps.status[name] |= 0;
                 Server.pendingOps.status[name]++;
-                await this.haproxyInstance.SendCommand(`set server ${name} state ${status}`);
+                await this.haproxyInstance.SendCommand('server/set-mode',{
+                    iid: this.proxy_id,
+                    sid: this.server_id,
+                    mode: status
+                });
                 Store.instance.TriggerUpdate();
-            }    
+            } 
         } catch{
             throw new Error("Unable to set the status for the server at this time, please try again later.");
         } finally {
@@ -306,12 +291,16 @@ export class Server extends ProxyComponent{
     }
 
     async SetWeight(weight: number): Promise<void> {
-        let name = this.full_server_name;
+        let name = this.server_identifier;
         try {
             if (weight >= 0 && weight <= 256) {
                 Server.pendingOps.weight[name] |= 0;
                 Server.pendingOps.weight[name]++;
-                await this.haproxyInstance.SendCommand(`set server ${name} weight ${weight}`);
+                await this.haproxyInstance.SendCommand('server/set-weight', {
+                    iid: this.proxy_id,
+                    sid: this.server_id,
+                    weight: weight
+                });
                 Store.instance.TriggerUpdate();
             }
         } catch{
