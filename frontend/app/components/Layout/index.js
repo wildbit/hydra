@@ -11,6 +11,7 @@ import View from 'components/View';
 import Instances from 'components/Instances';
 import CreateInstance from 'components/Instances/Create'
 import { Link } from 'react-router-dom';
+import { Icon } from 'components/Icon';
 
 const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
   return (
@@ -32,7 +33,7 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
                 className="btn btn-primary btn-block"
                 data-toggle="modal"
                 data-target="#create-instance">
-                + HAProxy Instance
+                <Icon name="plus-circle" /> HAProxy Instance
               </button>
             </div>
           </Sidebar>

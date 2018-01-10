@@ -117,19 +117,14 @@ injectGlobal`
     background-color: #FFF;
   }
   .instance-state {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50px;
-    background-color: grey;
+    font-size: 14px;
     margin-right: 8px;
-    vertical-align: -1px;
   }
   .instance-state.online {
-    background-color: #4bd496;
+    color: #4bd496;
   }
   .instance-state.offline {
-    background-color: #fe6e43;
+    color: #fe6e43;
   }
 
   /* Sidebar */
@@ -161,51 +156,6 @@ injectGlobal`
     }
     .sidebar .instances {
       height: calc(100vh - 8rem);
-    }
-  }
-
-  /* Spinner */
-  .spinner {
-    width: 18px;
-    height: 18px;
-    border-radius: 100%;
-    position: relative;
-    margin: 0 auto;
-    display: inline-block;
-  }
-  .spinner:before,
-  .spinner:after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    width: 100%;
-    height: 100%;
-    border-radius: 100%;
-    border: 3px solid transparent;
-    border-top-color: #3498db;
-  }
-
-  .spinner:before {
-    z-index: 100;
-    animation: spin 1s infinite;
-  }
-
-  .spinner:after {
-    border: 3px solid #dedede;
-  }
-
-  @keyframes spin {
-    0% {
-      -webkit-transform: rotate(0deg);
-      -ms-transform: rotate(0deg);
-      transform: rotate(0deg);
-    }
-
-    100% {
-      -webkit-transform: rotate(360deg);
-      -ms-transform: rotate(360deg);
-      transform: rotate(360deg);
     }
   }
 
