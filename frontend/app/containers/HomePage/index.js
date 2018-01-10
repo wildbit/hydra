@@ -107,8 +107,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
       let servers = {};
 
       p.servers.forEach(s => {
-        servers[s.full_server_name] = {
-          name: s.full_server_name,
+        servers[s.key] = {
+          name: s.service_name,
           weight: s.weight,
           active: s.is_active,
           self: s
@@ -127,7 +127,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     return (
       <Proxy name={proxy.name} key={proxy.name}>
         <ServerList>
-          {serverIds.map(server => this.mapServerToComponent({ proxy, server: servers[server] }))}
+          {serverIds.map(id => this.mapServerToComponent({ proxy, server: servers[id] }))}
         </ServerList>
       </Proxy>
     )
@@ -136,7 +136,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   mapServerToComponent = ({ proxy, server }) => {
     return (
       <Server
-        key={[proxy.key, server.name].join('+')}
+        key={server.key}
         onStatusChanged={this.handleOnStatusChanged}
         onWeightChanged={this.handleOnWeightChanged}
         proxyId={proxy.key}

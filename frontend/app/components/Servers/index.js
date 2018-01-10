@@ -5,7 +5,7 @@
 */
 
 import React from 'react';
-import { branch, compose, withHandlers, renderComponent } from 'recompose';
+import { branch, compose, renderComponent } from 'recompose';
 
 // import styled from 'styled-components';
 
@@ -16,27 +16,23 @@ const NullServers = () => {
   );
 };
 
-const Servers = ({ children }) => {
-  return (
-    <table className="table">
-      <thead>
-        <tr>
-          <th>Status</th>
-          <th>Server</th>
-          <th>Weight</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {children}
-      </tbody>
-    </table>
-  );
-}
+const Servers = ({ children }) => (
+  <table className="table">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Server</th>
+        <th>Weight</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {children}
+    </tbody>
+  </table>
+);
 
-Servers.propTypes = {
 
-};
 
 const enhance = compose(
   branch(

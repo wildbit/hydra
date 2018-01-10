@@ -72,9 +72,7 @@ class ProxyComponent {
     get haproxyInstance() { return this.proxy.haproxyInstance; }
     proxy: Proxy;
 
-    get key() {
-        return `${this.proxy.key}~${this.service_name}`;
-    }
+    get key() { return `${this.proxy.key}/${this.service_id}`; }
 
     constructor(proxy: Proxy, stats:any) {
         this.proxy = proxy;
@@ -120,12 +118,14 @@ export class Proxy {
 
     get name(): string { return this.stats.pxname; }
     get proxy_id() { return this.stats.iid; }
+
     get servers(): Server[]{
         return this._servers;
     }
     get key(): string {
-        return `${this.haproxyInstance.key}~${this.proxy_id}`;
+        return `${this.haproxyInstance.key}/${this.proxy_id}`;
     }
+
     constructor(haproxy: HAProxyInstance, apiData:any) {
         this.haproxyInstance = haproxy;
         this.stats = apiData.stats;

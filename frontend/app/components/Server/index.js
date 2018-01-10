@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import Slider from 'components/Slider';
 import Switch from 'components/Switch';
 
@@ -25,9 +24,9 @@ Server.propTypes = {
   proxyId: PropTypes.string,
   name: PropTypes.string,
   status: PropTypes.string,
-  weight: PropTypes.string,
+  weight: PropTypes.number,
   onStatusChanged: PropTypes.func,
-  onWeightChanged: PropTypes.func
+  onWeightChanged: PropTypes.func,
 };
 
 export default Server;
