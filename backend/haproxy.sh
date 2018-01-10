@@ -5,4 +5,4 @@ do
     echo "Waiting for config to be available..."
 done
 cd /var/haproxy
-haproxy -f /var/haproxy/haproxy.cfg
+haproxy -f /var/haproxy/haproxy.cfg -V

@@ -1,17 +1,5 @@
+json = require "json"
 -- Lua API reference: http://www.arpalert.org/src/haproxy-lua-api/1.7/index.html
-
--- The following outlines the socket address to which we need to connect.
--- it should match the unix socket that you defined in your haproxy.cfg
-local socket_address = "/var/run/haproxy.sock"
-
-function run_command(command)
-	s = core.tcp()
-	s:connect("unix@" .. socket_address)
-	s:send(command .. "\n")
-	results = s:receive("*a")
-	s:close()
-	return results
-end
 
 function get_metadata(applet)
 	-- This is a place to include optional metadata about your
@@ -22,34 +10,81 @@ function get_metadata(applet)
 	return "HOSTNAME ..."
 end
 
-function instance_manager(applet)
-	applet:add_header("Access-Control-Allow-Origin", "*")
-
-	if applet.method == "POST" and applet.length > 0 and applet.path == "/manage" then
-		local command = applet:receive()
-		local results = run_command(command)
-		if results == nil then
-			applet:set_status(404)
-			applet:start_response()
-			applet:send("No results found.")
-		else
-			applet:set_status(200)
-			applet:add_header("Content-Length", string.len(results))
-			applet:add_header("Content-Type", "text/plain")
-			applet:start_response()
-			applet:send(results)
+function get_stats(applet)
+	local proxies = {}
+	for i, p in pairs(core.proxies) do
+		local proxy = { stats = p:get_stats(), listeners = {}, servers = {} }
+		for _,l in pairs(p.listeners) do
+			table.insert(proxy.listeners, l:get_stats())
 		end
-	elseif applet.method == "GET" and applet.path == "/metadata" then
-		applet:set_status(200)
-		results = get_metadata(applet)
-		applet:add_header("Content-Length", string.len(results))
-		applet:start_response()
-		applet:send(results)
+		for _,s in pairs(p.servers) do
+			table.insert(proxy.servers, s:get_stats())
+		end
+		table.insert(proxies, proxy)
+	end
+	send_response(applet, { proxies = proxies })
+end
+
+function send_response(applet, response)
+			applet:set_status(200)
+	local response_json = json.encode(response)
+	applet:add_header('Access-Control-Allow-Origin', '*')
+	applet:add_header('Content-Type', 'application/json')
+	applet:add_header('Content-Length', string.len(response_json))
+			applet:start_response()
+	applet:send(response_json)
+end
+
+function find_server(lookup)
+	for _,p in pairs(core.proxies) do
+		local pxs = p:get_stats()
+		if pxs.pxname == lookup.pxname then
+			 for _, s in pairs(p.servers) do
+				 if s:get_stats().svname == lookup.svname then
+		 			return s
+		 		end
+		 	end
+		end
+	end
+	return nil
+end
+
+function process_request(applet)
+	if applet.path == '/stats' and applet.method == 'GET' then
+		get_stats(applet)
+	elseif applet.path == '/server/set-weight' and applet.method == 'POST' then
+		local command = json.decode(applet:receive())
+		local server = find_server(command)
+		local result = { success = false, weight = nil } 
+		if server ~= nil then
+			server:set_weight(command.weight)
+			result.success = true
+			result.weight = server:get_weight()
+		end
+		send_response(applet, result)
+	elseif applet.path == '/server/set-mode' and applet.method == 'POST' then
+		local command = json.decode(applet:receive())
+		local server = find_server(command)
+		local result = { success = false }
+		local mode = command.mode:lower()
+		if server ~= nil then
+			if mode == 'maint' then
+				server:set_maint()
+			elseif mode == 'drain' then
+				server:set_draining()
+			elseif mode == 'ready' then
+				server:set_ready()
+			end
+			result.success = true
+		end
+		send_response(applet, result)
 	else
-		applet:set_status(404)
-		applet:start_response()
-		applet:send("Please send an HAProxy command as the body of a POST request to /manage, or a GET request to /metadata")
+		send_response(applet, { endpoints = {
+			'/stats',
+			'/server/set-weight',
+			'/server/set-mode'
+		}})
 	end
 end
 
-core.register_service("instance_manager", "http", instance_manager)
+core.register_service("instance_manager", "http", process_request)
