@@ -18,7 +18,7 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
       <Header>
         <ul className="navbar-nav mr-auto">
           <li className="nav-item active">
-            <Link className="nav-link" href="/about">About</Link>
+            <Link className="nav-link" to="/about">About</Link>
           </li>
         </ul>
       </Header>

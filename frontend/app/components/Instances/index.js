@@ -16,7 +16,7 @@ const Instance = (i) => {
   return (
     <li className="list-group-item list-group-item-action" >
       {indicator}
-      <Link className={i.isCurrent ? 'text-success' : ''} href={`/${i.display_name}`}><span>{i.display_name}</span></Link>{i.has_loaded ? '' : ' (pending)'}
+      <Link className={i.isCurrent ? 'text-success' : ''} to={`/${i.display_name}`}><span>{i.display_name}</span></Link>{i.has_loaded ? '' : ' (pending)'}
     </li>
   );
 };
