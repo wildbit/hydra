@@ -58,6 +58,7 @@ export class HAProxyInstance {
             return results.data;
         } catch (err) {
             this.is_available = false;
+            throw err;
         }    
     }
 
