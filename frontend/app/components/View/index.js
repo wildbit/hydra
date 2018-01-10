@@ -10,7 +10,7 @@ import React from 'react';
 
 const Page = ({ children }) => {
   return (
-    <div className="main instance-details col-12 col-md-9 col-xl-8 py-md-3 pl-md-5">
+    <div className="main instance-details col-12 col-md-9 col-xl-9 py-md-3 pl-md-5">
       {children}
     </div>
   );

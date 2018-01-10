@@ -29,7 +29,7 @@ const Layout = ({ children, hideSidebar, model, onInstanceCreated }) => {
             <div className="controls">
               <button
                 type="button"
-                className="btn btn-primary btn-lg btn-block"
+                className="btn btn-primary btn-block"
                 data-toggle="modal"
                 data-target="#create-instance">
                 + HAProxy Instance
