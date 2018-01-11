@@ -17,6 +17,23 @@ injectGlobal`
     font-family: 'Karla', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
+  pre {
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #474554;
+    color: #FFF;
+  }
+
+  h4 {
+    margin: 2em 0 .5em;
+    font-weight: bold;
+  }
+
+  h6 {
+    margin-top: 2em;
+    font-weight: bold;
+  }
+
   header {
     position: sticky !important;
     top: 0;

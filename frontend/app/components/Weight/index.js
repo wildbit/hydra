@@ -31,7 +31,9 @@ const Weight = enhance(({ server, state, handleOnChange, handleOnAfterChange }) 
       max={256}
       value={weight || server.weight}
       onChange={handleOnChange}
-      onAfterChange={handleOnAfterChange} />
+      onAfterChange={handleOnAfterChange}
+      trackStyle={[{'background-color': '#4bd495'}]}
+      handleStyle={[{'border-color': '#4bd495'}]} />
   );
 });
 

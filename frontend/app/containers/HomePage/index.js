@@ -124,7 +124,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
             data-toggle="modal"
             disabled={!current}
             data-target="#remove-instance">
-            <Icon name="minus-circle" />
+            <Icon name="trash-o" /> Remove
           </button>
         </h2>
         {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
