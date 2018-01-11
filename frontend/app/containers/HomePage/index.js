@@ -16,6 +16,7 @@ import Store from 'models/Store.ts'
 
 import Layout from 'containers/Layout';
 import Proxy from 'components/Proxy';
+import RemoveInstance from 'components/Instances/Remove'
 import ServerList from 'components/Servers';
 import Server from 'components/Server';
 import { Icon } from 'components/Icon';
@@ -77,6 +78,11 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     );
   }
 
+  handleOnInstanceRemoved = (instance, callback) => {
+    Store.instance.Remove(instance);
+    callback();
+  }
+
   handleOnWeightChanged = ({ server, weight }) => {
     server.SetWeight(weight);
   }
@@ -112,8 +118,17 @@ export default class HomePage extends React.Component { // eslint-disable-line r
         <h2>
           <span>{current.display_name}</span>
           {this.renderStatusIcon()}
+          <button
+            type="button"
+            className="btn btn-light text-danger pull-right"
+            data-toggle="modal"
+            disabled={!current}
+            data-target="#remove-instance">
+            <Icon name="minus-circle" />
+          </button>
         </h2>
         {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
+        <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
       </Layout>
     );
   }
