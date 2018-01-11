@@ -80,6 +80,7 @@ function process_request(applet)
 		send_response(applet, result)
 	elseif applet.method == 'OPTIONS' then
 		applet:set_status(200)
+		applet:add_header('Access-Control-Allow-Headers', '*')
 		applet:add_header('Access-Control-Allow-Origin', '*')
 		applet:add_header('Allow', 'OPTIONS, GET, POST')
 		applet:start_response()
