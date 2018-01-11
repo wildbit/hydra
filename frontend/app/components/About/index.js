@@ -1,9 +1,9 @@
 import React from 'react';
 import Layout from 'containers/Layout';
 
-const About = () => {
+const About = (props) => {
   return (
-    <Layout hideSidebar model={{}}>
+    <Layout {...props}>
       <div className="container">
         <br />
         <h2>This is Hydra.</h2>
@@ -42,7 +42,7 @@ frontend stats_over_http
           After you've set up the configuration above, you should reload HAProxy. You can confirm that everything is working by curling one of the newly added endpoints:
         </p>
         <pre><code>$ curl http://127.0.0.1:9005/stats</code></pre>
-        
+
         <h4>Security</h4>
         <p>
           You might have noticed that the Lua script can run admin-level commands, and that we're making this available only to localhost 127.0.0.1:9005 by default.
