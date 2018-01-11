@@ -1,13 +1,23 @@
 language: node_js
 cache: yarn
 node_js:
-  - "node"
+- node
 before_install:
-  - cd frontend
-  - npm install -g yarn
+- cd frontend
+- npm install -g yarn
 install:
-  - yarn install
+- yarn install
 script:
-  - npm run build
+- npm run build
 deploy:
   skip_cleanup: true
+  provider: s3
+  access_key_id:
+    secure: "HNdH2TKWbPYOjnrKsQayiS4WPPB0MIeMYERXfJjNqw/yF6LNfDiGgYACReBILO08dwQrRGCJ5MHrBgjuD4FRjqQccKiL7PkAfc1YSy6+hNr3b21fW2MfnwzEv1BspNvXAeLq6GVkm7A6APINEj/Q8ztz2B/Fu+t8+aTZTooAWS5uceOnY8x0RDi27VWc1IKnYGgXW3qCN2QlD3QJMUtx7FI7IgUGbZRRSQzU3PZdizxIZpAY4Tvjt+nnTXOzmweNARM8it+TevYvYp9r1eaKacIYod13Gz3HsUpzr0kaAhaYNdeEYhYHN7gbncgNJqU3vVoYZ4pHo5cUPXl60V3oIYp8sYqmDX2GCnrpMLLYVbEaXSlu0PHUGSzU+e0g8I68FRGj7jbdZIrS7mZ2sHUMA1xCdyh56nleX9AdQ0lcFI9q2lNMPFBvw7F53MqixsL7XPj5gMsQmmMVxD/Uui/awU/Tw07S5q0LYFZ2j0vnkMYl+AdVuiukeg8LyoRtLmoFH00AHUbxSCqI+KpdjU5LhdpVsMjBRhlhFw49stIjaHnmuYiGTi8u6lrl2sDsMcrjCnZuIsrrarapic4HFaIlI47SssqgWlcSPfGSyaYVchnnUlBdnh4X8aY2CMGgfqRANbgy0+RHl1Go2X2ZYahLWc4mFlOWz9AABi1noXpMaww="
+  secret_access_key:
+    secure: "sbDG1rfiI0bEk7dsPiqk3tTUlokBPBNQTOcshlWTpmmdckcvoOioRwgb6fI8kSPBU6XxyjWpLUu0LlyIssby5rkKdWOmDUdnrWo7VvKk/slVhpsF74tbm+kjzJAHmw9659BkypqarE+PCn2f1E3N5Z7k2+a1q6bbu8ggWeSjCJRDmEzfXFyUgtdCaB6dPYEzIySK5p4/cgykJpGXV4/3CO4hPlGnLFI8HNVWkxGOBg7iu9QTYPByWx/tniEzz2uyBdRpnRMpSrIOFABNa4uW2+gCrPtYzbp++RY5Z3gYbbfPe+wMG11/suiFoEijifj+b9VY9YWmWdg/a9KASVcLYkPVsKbM5o4oUQueOzGQuGMJUPrZvUxYY/GBQtlCNx1W9PynwN+Ns627n12c5BvdBKxr8iprhJjsYUFhZaIycRpwKcTziOOVTgExw8epB3YQrJu39tKBFLJLjpp7qZFED0yXgql0lM47SY9AolYQg3N9G6bqiDsZOJlrM9mgoa0DTDkb0wQvzwv6qIRBKQ2AR16PiBESVcHeGcpsMc139R9yDUxJYB6QQISUMUCwKuqZfnFrYi+S40goBLYGgO4nH8GRpXSxxiXmLeyGJwUeB7OMTow6P78T2A+NUllPN+TizdsXsVCr/u9+GXCgDkOqQpMa8RSTx/TcgjIP5c8boBQ="
+  bucket: hydra.wildbit.com
+  local_dir: frontend/build
+  acl: public_read
+  on:
+    tags: true
