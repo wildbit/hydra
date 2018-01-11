@@ -24,20 +24,20 @@ const active = (isActive) => {
   return isActive ? 'active' : '';
 };
 
-
 const Status = ({ server, handleOnClick }) => {
   let { status } = server;
   let states = ['DRAIN', 'MAIN', 'READY'];
 
   return (
-    <div className="btn-group btn-group-sm" role="group" aria-label="Status">
+    <div className="btn-group btn-group-sm pull-right" role="group" aria-label="Status">
       {
         states.map(s => {
           return (
             <button
+              key={s}
               type="button"
               onClick={handleOnClick}
-              className={`btn btn-secondary ${active(status === s)}`}
+              className={`btn btn-secondary ${active(status === s)}`.trim()}
               value={s}>
               {s}
             </button>
