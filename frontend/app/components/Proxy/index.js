@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 const ProxyContainer = styled.div`
   border-radius: 5px;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
   background-color: #FFF;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0,.07);
@@ -24,7 +24,7 @@ const Title = styled.h4`
 const Proxy = ({ name, children }) => {
   return (
     <ProxyContainer>
-      <Title>{name}</Title>
+      <Title>{name} <span className="badge-count">{children.props.children.length}</span></Title>
       {children}
     </ProxyContainer>
   );
