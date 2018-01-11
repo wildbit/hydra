@@ -3,10 +3,11 @@ cache: yarn
 node_js:
   - "node"
 before_install:
+  - cd frontend
   - npm install -g yarn
 install:
-  - cd frontend && yarn install
+  - yarn install
 script:
-  - cd frontend && npm run build
+  - npm run build
 deploy:
   skip_cleanup: true
