@@ -26,7 +26,7 @@ function get_stats(applet)
 end
 
 function send_response(applet, response)
-			applet:set_status(200)
+	applet:set_status(200)
 	local response_json = json.encode(response)
 	applet:add_header('Access-Control-Allow-Origin', '*')
 	applet:add_header('Content-Type', 'application/json')
@@ -78,12 +78,23 @@ function process_request(applet)
 			result.success = true
 		end
 		send_response(applet, result)
-	else
+	elseif applet.method == 'OPTIONS' then
+		applet:set_status(200)
+		applet:add_header('Access-Control-Allow-Origin', '*')
+		applet:add_header('Allow', 'OPTIONS, GET, POST')
+		applet:start_response()
+		applet:send('')
+	elseif applet.method == 'GET' and applet.path == '/' then
 		send_response(applet, { endpoints = {
 			'/stats',
 			'/server/set-weight',
 			'/server/set-mode'
 		}})
+	else
+		applet:set_status(404)
+		applet:add_header('Access-Control-Allow-Origin', '*')
+		applet:start_response()
+		applet:send('Endpoint not found.')
 	end
 end
 
