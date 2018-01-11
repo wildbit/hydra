@@ -7,7 +7,7 @@
 import React from 'react';
 import { branch, compose, renderComponent } from 'recompose';
 import styled from 'styled-components';
-import { Icon } from 'components/icon';
+import { Icon } from 'components/Icon';
 
 const BlankState = styled.p`
   padding: 0 1.5rem 1rem;
