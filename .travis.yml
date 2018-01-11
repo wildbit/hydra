@@ -6,6 +6,8 @@ node_js:
 before_install:
 - cd frontend
 install:
+- python -m pip install --upgrade pip setuptools wheel
+- pip install awscli --upgrade
 - yarn install
 - npm install -g yarn
 script:
@@ -21,7 +23,6 @@ deploy:
   on:
     tags: true
 after_deploy:
-- pip install awscli --upgrade
 - aws configure set preview.cloudfront true
 - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID
 env:
