@@ -61,8 +61,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   handleOnInstanceCreated = (instance, callback) => {
-    let newInstance = Store.instance
-      .Add(instance.url, instance.name, instance.username, instance.password);
+    let newInstance = Store.instance.Add(instance.url, instance.name, instance.username, instance.password);
+
     if (newInstance) {
       callback();
     }
@@ -96,14 +96,11 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     // });
   }
 
-  handleOnStatusChanged = (event) => {
-    // let $server = $(event.target).parents('tr');
-
-    // this.changeWeight({
-    //   proxyId: $server.data('proxy-id'),
-    //   serverId: $server.data('server-id'),
-    //   weight: event.target.checked ? '100' : '0'
-    // });
+  handleOnStatusChanged = ({ server, status }) => {
+    console.log(server, 'CHANGE STATUS', status);
+    // CHANGE STATE HERE
+    //
+    server.SetStatus(status);
   }
 
   renderStatusIcon = () => {
@@ -125,7 +122,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
         </Layout>
       );
     }
-
     else {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>

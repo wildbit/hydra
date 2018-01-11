@@ -34,7 +34,7 @@ const Slider = enhance(({ value, handleOnChange }) => {
 });
 
 Slider.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.number,
   onChange: PropTypes.func,
 };
 
