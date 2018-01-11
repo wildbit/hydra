@@ -233,6 +233,7 @@
     "papaparse": "^4.3.6",
     "popper.js": "^1.12.9",
     "prop-types": "15.5.10",
+    "rc-slider": "^8.6.0",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-helmet": "5.1.3",
