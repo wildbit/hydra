@@ -8,8 +8,8 @@ before_install:
 install:
 - python -m pip install --upgrade pip setuptools wheel
 - pip install awscli --upgrade
-- yarn install
 - npm install -g yarn
+- yarn install
 script:
 - npm run build
 deploy:
