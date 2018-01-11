@@ -27,10 +27,10 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   componentDidMount() {
-    Store.instance.RegisterListener(this, (updatedModels) => {
-      let { instances, current } = this.state;
-      instances = updatedModels;
-      current = current || instances[0];
+    Store.instance.RegisterListener(this, (instances) => {
+      let { params } = this.props.match;
+      let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
+
       this.setState({ instances, current });
     });
   }
