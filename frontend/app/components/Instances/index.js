@@ -31,17 +31,19 @@ const Instance = (i) => {
   );
 };
 
-const Instances = ({ model }) => (
+const Instances = ({ instances, current }) => (
   <div className="instances">
     <ul className="nav flex-column">
-      {model.instances.map((i) =>
-        <Instance key={i.key} isCurrent={model.current && model.current.key === i.key} {...i} />)}
+      {
+        instances.map((i) => <Instance key={i.key} isCurrent={current && current.key === i.key} {...i} />)
+      }
     </ul>
   </div>
 );
 
 Instances.propTypes = {
-  model: PropTypes.object,
+  instances: PropTypes.array,
+  current: PropTypes.object
 };
 
 export default Instances;
