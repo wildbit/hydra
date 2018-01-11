@@ -13,7 +13,6 @@ import Sidebar from 'components/Menu/Sidebar';
 import View from 'components/View';
 import Instances from 'components/Instances';
 import CreateInstance from 'components/Instances/Create'
-import RemoveInstance from 'components/Instances/Remove'
 import { Link } from 'react-router-dom';
 import { Icon } from 'components/Icon';
 
@@ -62,11 +61,6 @@ export default class Layout extends React.Component { // eslint-disable-line rea
     }
   }
 
-  handleOnInstanceRemoved = (instance, callback) => {
-    Store.instance.Remove(instance);
-    callback();
-  }
-
   render() {
     let { current } = this.state;
     const { children } = this.props;
@@ -84,25 +78,14 @@ export default class Layout extends React.Component { // eslint-disable-line rea
           <div className="row flex-xl-nowrap">
             <Sidebar>
               <Instances {...this.state} />
-              <div className="controls row">
-              <div className="col-6">
+              <div className="controls">
                 <button
                   type="button"
                   className="btn btn-primary btn-block"
                   data-toggle="modal"
                   data-target="#create-instance">
                   <Icon name="plus-circle" /> HAProxy Instance
-                </button></div>
-                <div className="col-6">
-                <button
-                  type="button"
-                  className="btn btn-light text-danger btn-block"
-                  data-toggle="modal"
-                  disabled={!current}
-                  data-target="#remove-instance">
-                  <Icon name="minus-circle" /> HAProxy Instance
                 </button>
-                </div>  
               </div>
             </Sidebar>
             <View>
@@ -112,7 +95,6 @@ export default class Layout extends React.Component { // eslint-disable-line rea
               </footer>
             </View>
             <CreateInstance id="create-instance" onSubmit={this.handleOnInstanceCreated} />
-            <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
           </div>
         </main>
       </div>
