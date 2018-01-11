@@ -42,7 +42,8 @@
     "test:clean": "rimraf ./coverage",
     "test": "cross-env NODE_ENV=test jest --coverage",
     "test:watch": "cross-env NODE_ENV=test jest --watchAll",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "invalidate-cloudfront": "node ./internals/scripts/invalidate-cloudfront.js"
   },
   "lint-staged": {
     "*.js": "lint:eslint"
@@ -257,6 +258,7 @@
     "@types/papaparse": "^4.1.33",
     "@types/react": "^16.0.34",
     "add-asset-html-webpack-plugin": "2.0.1",
+    "aws-sdk": "^2.180.0",
     "babel-cli": "6.24.1",
     "babel-core": "6.24.1",
     "babel-eslint": "7.2.3",

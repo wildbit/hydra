@@ -4,10 +4,8 @@ python: 3.7
 node_js:
 - node
 before_install:
-- pip install requests[security]
 - cd frontend
 install:
-- pip install awscli --upgrade
 - npm install -g yarn
 - yarn install
 script:
@@ -23,8 +21,7 @@ deploy:
   on:
     tags: true
 after_deploy:
-- aws configure set preview.cloudfront true
-- aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID
+- npm run invalidate-cloudfront
 env:
   global:
   - secure: E1xuh9uoRYSNqi54KqgYCqAfyUfzhkYVjbNoU5xsxFKNm45YI8GEyEXkmgWTCgVrZztakiAnOhR0diw0xZn/wWVMyJs7f8LemqPqTq1EL4lRNh8wJ7WXb49d3L59C3xV7KEouOG5agqojyeqzhV+RqS4wtMN8ODkp7HCFLMi4AU5R4+sglRaZ+pSLwuuzXKlXiRdCm0YNpgb9NhmUl4gV0v7xVarpgX7C+aRTko2thIT+jm/YMxc+3TzCyPLmTNXqjKEgLcOQhUyezbhPYH4V9H4kAVPJ/WTV5iMLSZLrPpEYPucmjh5+OPPgKKYQ+PfIhS85jbFkEwZ8QTbjkBfOXn6ShMgFQtuRnVNIlBvd2FcZrpEUXOfO9CmNuLjXZRaw3MXfHuaz/uYtxuq8BhKHZbtGS24V70TneChGsJuNvqZLQ90v5sL7MlXkDldz0J0+DoFP39T0P00VfJUY3FxCrHHaTcguacGi1Et0MKe9sL0MIaldZjL0nKE4oQvoBCjeo9yMTu0kUWVKfDKyq7w83GlKiMbwKDuUMU4a0gQeugAStidgOrbmiXik8zO7o2gU+us6yRVYpxK2RyIL+zFsE6kAdv/pGUCn51IIRLJ+TYM5xDTmBt1fc7DjvtX+xVV0H8DwlwYUJhHn2P1jzh65dgIKav2Uz3+iXM6MuEu+sc=
