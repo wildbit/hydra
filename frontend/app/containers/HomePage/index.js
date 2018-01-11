@@ -32,7 +32,9 @@ export default class HomePage extends React.Component { // eslint-disable-line r
       this.setState({ instances });
     });
 
-    this.setState({ instances: Store.instance.List() });
+    this.setState({ instances: Store.instance.List() }, ()  => {
+      this.setCurrent();
+    });
   }
 
   componentWillReceiveProps(nextProps) {
