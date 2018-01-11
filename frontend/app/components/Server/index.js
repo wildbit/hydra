@@ -12,6 +12,8 @@ import Status from 'components/Status';
 const Server = ({ server, onStatusChanged, onWeightChanged }) => {
   let status = <Icon className={`instance-state ${server.status.toLowerCase() === 'up' ? 'online': 'offline'}`}
                      name="circle" />
+
+    console.log(server.status, server.mode);
   return (
     <tr
       data-proxy-id={server.proxy_id}
