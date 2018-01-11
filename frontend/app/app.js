@@ -44,6 +44,7 @@ import { translationMessages } from './i18n';
 // Import CSS reset and Global Styles
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'rc-slider/assets/index.css';
 import './global-styles';
 
 // Create redux store with history
