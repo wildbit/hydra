@@ -10,6 +10,7 @@ injectGlobal`
     width: 100%;
     margin: 0;
     padding: 0;
+    background-color: #f6f7fb;
   }
 
   body {
@@ -20,10 +21,6 @@ injectGlobal`
     position: sticky !important;
     top: 0;
     z-index: 1050;
-  }
-
-  #app {
-    background-color: #f6f7fb;
   }
 
   main.container {
