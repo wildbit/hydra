@@ -4,6 +4,7 @@ python: 3.7
 node_js:
 - node
 before_install:
+- apt-get install python3-venv
 - python3 -m venv py3
 - source py3/bin/activate
 - cd frontend
