@@ -1,6 +1,6 @@
 language: node_js
 cache: yarn
-pyton: 3.7
+python: 3.7
 node_js:
 - node
 before_install:
@@ -8,7 +8,6 @@ before_install:
 install:
 - yarn install
 - npm install -g yarn
-- pip install awscli
 script:
 - npm run build
 deploy:
@@ -22,6 +21,7 @@ deploy:
   on:
     tags: true
 after_deploy:
+- pip install awscli --upgrade
 - aws configure set preview.cloudfront true
 - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID
 env:
