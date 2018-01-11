@@ -22,7 +22,7 @@ const Server = ({ server, onStatusChanged, onWeightChanged }) => {
           {status}{server.service_name}
         </span>
       </td>
-      <td><Slider onChange={onWeightChanged} value={server.weight} /></td>
+      <td><Slider onChange={onWeightChanged} server={server} /></td>
       <td><Status onChange={onStatusChanged} server={server} /></td>
     </tr>
   );

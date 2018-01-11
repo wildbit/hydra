@@ -10,16 +10,19 @@ import { compose, withHandlers } from 'recompose';
 
 const enhance = compose(
   withHandlers({
-    handleOnChange: ({ onChange }) => event => {
-      onChange({ target: event.target });
+    handleOnChange: ({ server, onChange }) => event => {
+      let weight = parseInt(event.target.value);
+      onChange({ server, weight });
     }
   })
 );
 
-const Slider = enhance(({ value, handleOnChange }) => {
+const Slider = enhance(({ server, handleOnChange }) => {
+  let { weight } = server;
+
   return (
     <div>
-      <input type="range" min="0" max="256" list="tickmarks" value={value} onChange={handleOnChange} />
+      <input type="range" min="0" max="256" list="tickmarks" value={weight} onChange={handleOnChange} />
       <datalist id="tickmarks">
         <option value="0" label="DRAIN" />
         <option value="20" />
@@ -34,7 +37,7 @@ const Slider = enhance(({ value, handleOnChange }) => {
 });
 
 Slider.propTypes = {
-  value: PropTypes.number,
+  server: PropTypes.object,
   onChange: PropTypes.func,
 };
 

@@ -68,38 +68,11 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     }
   }
 
-  changeWeight = ({ proxyId, serverId, weight }) => {
-    // let { current } = this.state;
-    // let server = current.proxies[proxyId].servers[serverId].self;
-
-    // server
-    //   .SetWeight(parseInt(weight))
-    //   .then(() => {
-    //     current.proxies[proxyId].servers[serverId].weight = weight;
-    //   })
-    //   .catch(error => {
-    //     console.log(`${serverId} - SET WEIGHT FAILED`, error);
-    //   });
-
-    // this.setState({ current }, () => {
-    //   console.log(`${serverId} weight changed to ${weight}`);
-    // })
-  }
-
-  handleOnWeightChanged = (event) => {
-    // let $server = $(event.target).parents('tr');
-
-    // this.changeWeight({
-    //   proxyId: $server.data('proxy-id'),
-    //   serverId: $server.data('server-id'),
-    //   weight: event.target.value
-    // });
+  handleOnWeightChanged = ({ server, weight }) => {
+    server.SetWeight(weight);
   }
 
   handleOnStatusChanged = ({ server, status }) => {
-    console.log(server, 'CHANGE STATUS', status);
-    // CHANGE STATE HERE
-    //
     server.SetStatus(status);
   }
 
