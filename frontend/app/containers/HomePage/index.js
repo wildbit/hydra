@@ -14,7 +14,7 @@ import $ from 'jquery';
 
 import Store from 'models/Store.ts'
 
-import Layout from 'components/Layout';
+import Layout from 'containers/Layout';
 import Proxy from 'components/Proxy';
 import ServerList from 'components/Servers';
 import Server from 'components/Server';
@@ -77,19 +77,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     );
   }
 
-  handleOnInstanceCreated = (instance, callback) => {
-    let newInstance = Store.instance.Add(instance.url, instance.name, instance.username, instance.password);
-
-    if (newInstance) {
-      callback();
-    }
-  }
-
-  handleOnInstanceRemoved = (instance, callback) => {
-    Store.instance.Remove(instance);
-    callback();
-  }
-
   handleOnWeightChanged = ({ server, weight }) => {
     server.SetWeight(weight);
   }
@@ -114,14 +101,14 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
     if (!current) {
       return (
-        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated} onInstanceRemoved={this.handleOnInstanceRemoved}>
+        <Layout {...this.props}>
           <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
         </Layout>
       );
     }
 
     return (
-      <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated} onInstanceRemoved={this.handleOnInstanceRemoved}>
+      <Layout {...this.props}>
         <h2>
           <span>{current.display_name}</span>
           {this.renderStatusIcon()}

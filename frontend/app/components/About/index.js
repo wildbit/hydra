@@ -1,14 +1,14 @@
 import React from 'react';
-import Layout from 'components/Layout';
+import Layout from 'containers/Layout';
 
-const About = () => {
+const About = (props) => {
   return (
-    <Layout hideSidebar={true} model={{}}>
+    <Layout {...props}>
       <p>
         This is information about this interface, how to set it up, and what it does. Ideally, it's loaded from a Markdown thing.
       </p>
-    </Layout>
-    );
+  </Layout>
+  );
 };
 
 export default About;
