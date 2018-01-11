@@ -20,12 +20,16 @@ const enhance = compose(
   })
 );
 
+const active = (isActive) => {
+  return isActive ? 'active' : '';
+};
+
 const Status = ({ server, handleOnClick }) => {
   return (
     <div className="btn-group btn-group-sm" role="group" aria-label="Status">
-      <button type="button" onClick={handleOnClick} className={`btn btn-${(server.status === 'drain') ? 'secondary' : 'light'}`} value='DRAIN'>DRAIN</button>
-      <button type="button" onClick={handleOnClick} className={`btn btn-${(server.status === 'maint') ? 'secondary' : 'light'}`} value='MAIN'>MAINT</button>
-      <button type="button" onClick={handleOnClick} className={`btn btn-${(server.status === 'ready') ? 'secondary' : 'light'}`} value='READY'>READY</button>
+      <button type="button" onClick={handleOnClick} className={`btn btn-secondary ${active(server.status === 'drain')}`} value='DRAIN'>DRAIN</button>
+      <button type="button" onClick={handleOnClick} className={`btn btn-secondary ${active(server.status === 'main')}`} value='MAIN'>MAINT</button>
+      <button type="button" onClick={handleOnClick} className={`btn btn-secondary ${active(server.status === 'ready')}`} value='READY'>READY</button>
     </div>
   );
 }
