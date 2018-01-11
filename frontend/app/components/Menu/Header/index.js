@@ -5,16 +5,13 @@
 */
 
 import React from 'react';
-import styled from 'styled-components';
-
-const Heading = styled.header``;
-
+import { Link } from 'react-router-dom';
 
 const Header = ({ children }) => {
   return (
-    <Heading className="navbar-dark bg-dark flex-column flex-md-row">
+    <header className="navbar-dark bg-dark flex-column flex-md-row">
       <nav className="navbar navbar-expand">
-        <a href="/" className="navbar-brand">Hydra</a>
+        <Link to="/" className="navbar-brand">Hydra</Link>
         <button className="navbar-toggler collapsed" type="button"
           data-toggle="collapse" data-target="#navbarCollapse"
           aria-controls="navbarCollapse" aria-expanded="false"
@@ -25,7 +22,7 @@ const Header = ({ children }) => {
           {children}
         </div>
       </nav>
-    </Heading>
+    </header>
   );
 }
 

@@ -28,15 +28,27 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   componentDidMount() {
     Store.instance.RegisterListener(this, (instances) => {
-      let { params } = this.props.match;
-      let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
-
-      this.setState({ instances, current });
+      this.setCurrent();
+      this.setState({ instances });
     });
+
+    this.setState({ instances: Store.instance.List() });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setCurrent(nextProps);
   }
 
   componentWillUnmount() {
     Store.instance.UnregisterListener(this);
+  }
+
+  setCurrent = (nextProps) => {
+    let { instances }  = this.state;
+    let { params } = (nextProps || this.props).match;
+    let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
+
+    this.setState({ current });
   }
 
   mapProxyToComponent = (proxy) => {
@@ -88,23 +100,24 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   render() {
-    if (!this.state.current) {
+    let { current } = this.state;
+
+    if (!current) {
       return (
         <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
           <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
         </Layout>
       );
     }
-    else {
-      return (
-        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
-          <h2>
-            <span>{this.state.current.display_name}</span>
-            {this.renderStatusIcon()}
-          </h2>
-          { this.state.current.proxies.map((proxy) => this.mapProxyToComponent(proxy)) }
-        </Layout>
-      );
-    }
+
+    return (
+      <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+        <h2>
+          <span>{current.display_name}</span>
+          {this.renderStatusIcon()}
+        </h2>
+        {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
+      </Layout>
+    );
   }
 }
