@@ -17,7 +17,7 @@ deploy:
   secret_access_key:
     secure: "sbDG1rfiI0bEk7dsPiqk3tTUlokBPBNQTOcshlWTpmmdckcvoOioRwgb6fI8kSPBU6XxyjWpLUu0LlyIssby5rkKdWOmDUdnrWo7VvKk/slVhpsF74tbm+kjzJAHmw9659BkypqarE+PCn2f1E3N5Z7k2+a1q6bbu8ggWeSjCJRDmEzfXFyUgtdCaB6dPYEzIySK5p4/cgykJpGXV4/3CO4hPlGnLFI8HNVWkxGOBg7iu9QTYPByWx/tniEzz2uyBdRpnRMpSrIOFABNa4uW2+gCrPtYzbp++RY5Z3gYbbfPe+wMG11/suiFoEijifj+b9VY9YWmWdg/a9KASVcLYkPVsKbM5o4oUQueOzGQuGMJUPrZvUxYY/GBQtlCNx1W9PynwN+Ns627n12c5BvdBKxr8iprhJjsYUFhZaIycRpwKcTziOOVTgExw8epB3YQrJu39tKBFLJLjpp7qZFED0yXgql0lM47SY9AolYQg3N9G6bqiDsZOJlrM9mgoa0DTDkb0wQvzwv6qIRBKQ2AR16PiBESVcHeGcpsMc139R9yDUxJYB6QQISUMUCwKuqZfnFrYi+S40goBLYGgO4nH8GRpXSxxiXmLeyGJwUeB7OMTow6P78T2A+NUllPN+TizdsXsVCr/u9+GXCgDkOqQpMa8RSTx/TcgjIP5c8boBQ="
   bucket: hydra.wildbit.com
-  local_dir: frontend/build
+  local_dir: build
   acl: public_read
   on:
     tags: true
