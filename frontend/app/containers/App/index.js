@@ -14,7 +14,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 
-import Layout from 'containers/Layout';
 import About from 'components/About';
 import Home from 'containers/HomePage';
 import NotFound from 'containers/NotFoundPage/Loadable';

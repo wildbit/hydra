@@ -84,22 +84,25 @@ export default class Layout extends React.Component { // eslint-disable-line rea
           <div className="row flex-xl-nowrap">
             <Sidebar>
               <Instances {...this.state} />
-              <div className="controls">
+              <div className="controls row">
+              <div className="col-6">
                 <button
                   type="button"
                   className="btn btn-primary btn-block"
                   data-toggle="modal"
                   data-target="#create-instance">
                   <Icon name="plus-circle" /> HAProxy Instance
-                </button>
+                </button></div>
+                <div className="col-6">
                 <button
                   type="button"
-                  className="btn btn-danger btn-block"
+                  className="btn btn-light text-danger btn-block"
                   data-toggle="modal"
-                  style={{ "display": (!current) ? 'none': '' }}
+                  disabled={!current}
                   data-target="#remove-instance">
                   <Icon name="minus-circle" /> HAProxy Instance
                 </button>
+                </div>  
               </div>
             </Sidebar>
             <View>
