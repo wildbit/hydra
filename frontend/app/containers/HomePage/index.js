@@ -28,13 +28,10 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   componentDidMount() {
     Store.instance.RegisterListener(this, (instances) => {
-      this.setCurrent();
-      this.setState({ instances });
+      this.refresh(instances);
     });
 
-    this.setState({ instances: Store.instance.List() }, ()  => {
-      this.setCurrent();
-    });
+    this.refresh(Store.instance.List());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -43,6 +40,12 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   componentWillUnmount() {
     Store.instance.UnregisterListener(this);
+  }
+
+  refresh = (instances) => {
+    this.setState({ instances: instances }, ()  => {
+      this.setCurrent();
+    });
   }
 
   setCurrent = (nextProps) => {
@@ -82,6 +85,11 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     }
   }
 
+  handleOnInstanceRemoved = (instance, callback) => {
+    Store.instance.Remove(instance);
+    callback();
+  }
+
   handleOnWeightChanged = ({ server, weight }) => {
     server.SetWeight(weight);
   }
@@ -106,14 +114,14 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
     if (!current) {
       return (
-        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+        <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated} onInstanceRemoved={this.handleOnInstanceRemoved}>
           <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
         </Layout>
       );
     }
 
     return (
-      <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated}>
+      <Layout model={this.state} onInstanceCreated={this.handleOnInstanceCreated} onInstanceRemoved={this.handleOnInstanceRemoved}>
         <h2>
           <span>{current.display_name}</span>
           {this.renderStatusIcon()}

@@ -26,7 +26,7 @@ const active = (isActive) => {
 
 const Status = ({ server, handleOnClick }) => {
   let { status } = server;
-  let states = ['DRAIN', 'MAIN', 'READY'];
+  let states = ['drain', 'main', 'ready'];
 
   return (
     <div className="btn-group btn-group-sm pull-right" role="group" aria-label="Status">
@@ -37,7 +37,7 @@ const Status = ({ server, handleOnClick }) => {
               key={s}
               type="button"
               onClick={handleOnClick}
-              className={`btn btn-secondary ${active(status === s)}`.trim()}
+              className={`text-uppercase btn btn-secondary ${active(status === s)}`.trim()}
               value={s}>
               {s}
             </button>
