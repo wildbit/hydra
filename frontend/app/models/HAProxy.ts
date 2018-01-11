@@ -13,7 +13,7 @@ export class HAProxyInstance {
     private config: AxiosRequestConfig;
     settings: ConnectionSettings
     display_name: string
-    is_available = false;
+    is_available = null;
     has_loaded = false;
     
     get key():string {
@@ -82,7 +82,6 @@ export class HAProxyInstance {
             return this.proxies;
         }
         catch (err) {
-            //throw err;
             //throw new Error("Unable to retrieve server info at this time.");
         }
     }

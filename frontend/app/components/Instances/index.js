@@ -11,11 +11,11 @@ import { Icon } from '../Icon';
 
 const Instance = (i) => {
   let pending = '';
-  if (!i.has_loaded) {
+  if (!i.has_loaded && i.is_available === null) {
     pending = <Icon className="text-primary" name="circle-o-notch" spin />;
   }
 
-  let count = ''
+  let count = '';
   if (i.is_available) {
     count = <span className="badge-count">{i.proxies.length}</span>
   }
