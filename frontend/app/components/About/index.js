@@ -53,7 +53,7 @@ frontend stats_over_http
         <p>We recommend that you <em>never</em> directly open the http port to the public Internet. If you want simpler access to your servers, we configuring the listener to use https, and add an ACL to the listener that requires Basic HTTP Auth to use the listener.</p>
         <p>If setting up https and ACLs is not easy/feasible, another simple option is to add an SSH port tunnel to your HAProxy server. This allows you to connect to the local port on your HAProxy instance as though it is local. We like this method, as the listener will only be available, over an encrypted connection, to users that have ssh access to the HAProxy server.</p>
         <h4>Extending, Complements, and Issues</h4>
-        <p>This an Open Source project! You can modify and serve it from your own system. <a href="https://github.com/wildbit/hydra" target="_blank">Checkout our our github project.</a></p>
+        <p>This an Open Source project! You can modify and serve it from your own system. <a href="https://github.com/wildbit/hydra" target="_blank">Checkout our github project.</a></p>
       </div>
     </Layout>
   );

@@ -34,9 +34,7 @@ export class HAProxyInstance {
         }
         this.display_name = settings.display_name || settings.url;
 
-        setInterval(async () => {
-            await this.Proxies();
-        }, 5000)
+        setInterval(async () => { await this.Proxies(); }, 5000)
         this.Proxies();
     }
 
@@ -304,6 +302,7 @@ export class Server extends ProxyComponent{
                     sid: this.server_id,
                     mode: status
                 });
+                console.log('UPDATE TRIGGERED');
                 Store.instance.TriggerUpdate();
             } 
         } catch{

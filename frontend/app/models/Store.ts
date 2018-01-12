@@ -33,6 +33,19 @@ export default class Store{
         return newInstance;
     }
 
+    public Update(instance: HAProxyInstance, url: string, display_name: string = null,
+        username: string = null, password: string = null, timeout:number = 5): HAProxyInstance {
+        let index = this.instances.indexOf(instance);
+        let newInstance = new HAProxyInstance({
+            url, username, password,
+            timeout, display_name
+        });
+
+        this.instances.splice(index, 1, newInstance);
+        this.SaveInstances()
+        return newInstance;
+    }
+
     public Remove(instance: HAProxyInstance) {
         this.instances = this.instances.filter(f => f != instance);
         this.SaveInstances();
