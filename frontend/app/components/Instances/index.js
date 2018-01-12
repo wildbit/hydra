@@ -22,7 +22,7 @@ const Instance = (i) => {
   return (
     <li className="nav-item" >
       <Link className={`nav-link instance-item ${i.isCurrent ? 'disabled' : ''}`} to={`/${i.display_name}`}>
-        <Icon className={`instance-state ${i.is_available ? 'online': 'offline'}`} name="circle" />
+        <Icon className={`instance-state ${i.is_available ? 'connected': 'disconnected'}`} name="circle" />
         <span>{i.display_name}</span>
         &nbsp;{pending}
         {count}
