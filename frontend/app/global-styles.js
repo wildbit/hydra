@@ -148,10 +148,10 @@ injectGlobal`
 
   .instance-state-label,
   .instance-state {
-    &.connected {
+    &.connected, &.online {
       color: #4bd496;
     }
-    &.disconnected {
+    &.disconnected, &.offline {
       color: #fe6e43;
     }
   }

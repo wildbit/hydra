@@ -143,11 +143,16 @@ class ProxyComponent {
 export class Proxy {
     private stats:any;
     private _servers: Server[] = [];
-    
+    private _listeners: any[] = [];
+
     haproxyInstance: HAProxyInstance;
 
     get name(): string { return this.stats.pxname; }
     get proxy_id() { return this.stats.iid; }
+    get type():number { return this.stats.type; }
+    get is_listener() { return this._listeners.length > 0 && this.type == 1 }
+    get is_simple_frontend() { return this.type == 0 && this._servers.length == 0 }
+    get is_simple_backend() { return this.type == 1 && this._listeners.length == 0 }
 
     get servers(): Server[]{
         return this._servers;
@@ -160,6 +165,7 @@ export class Proxy {
         this.haproxyInstance = haproxy;
         this.stats = apiData.stats;
         this._servers = apiData.servers.map(k => new Server(this, k));
+        this._listeners = apiData.listeners || [];
     }
 
     UpdateData(apiData: any) {
@@ -181,6 +187,7 @@ export class Proxy {
             newServers.push(server);
         });
         this._servers = newServers;
+        this._listeners = apiData.listeners || [];
     }
 }
 

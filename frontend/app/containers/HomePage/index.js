@@ -59,7 +59,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   mapProxyToComponent = (proxy) => {
     return (
-      <Proxy name={proxy.name} key={proxy.key}>
+      <Proxy model={proxy} key={proxy.key}>
         <ServerList>
           {proxy.servers.map(server => this.mapServerToComponent(server))}
         </ServerList>
