@@ -429,9 +429,9 @@ function find_server(lookup)
 end
 
 function process_request(applet)
-	if applet.path == '/stats' and applet.method == 'GET' then
+	if applet.path == '/api/stats' and applet.method == 'GET' then
 		get_stats(applet)
-	elseif applet.path == '/server/set-weight' and applet.method == 'POST' then
+	elseif applet.path == '/api/server/set-weight' and applet.method == 'POST' then
 		local command = json.decode(applet:receive())
 		local server = find_server(command)
 		local result = { success = false, weight = nil } 
@@ -441,7 +441,7 @@ function process_request(applet)
 			result.weight = server:get_weight()
 		end
 		send_response(applet, result)
-	elseif applet.path == '/server/set-mode' and applet.method == 'POST' then
+	elseif applet.path == '/api//server/set-mode' and applet.method == 'POST' then
 		local command = json.decode(applet:receive())
 		local server = find_server(command)
 		local result = { success = false }
@@ -466,9 +466,9 @@ function process_request(applet)
 		applet:send('')
 	elseif applet.method == 'GET' and applet.path == '/' then
 		send_response(applet, { endpoints = {
-			'/stats',
-			'/server/set-weight',
-			'/server/set-mode'
+			'/api/stats',
+			'/api/server/set-weight',
+			'/api/server/set-mode'
 		}})
 	else
 		applet:set_status(404)

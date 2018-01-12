@@ -25,7 +25,7 @@ export class HAProxyInstance {
     constructor(settings: ConnectionSettings) {
         this.settings = settings;
         this.config = <AxiosRequestConfig> {
-            baseURL: settings.url,
+            baseURL: settings.url + '/api/',
             timeout: (settings.timeout || 10) * 1000
         }
 
