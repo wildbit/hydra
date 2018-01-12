@@ -92,7 +92,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   renderStatusIcon = () => {
-    let status = this.state.current.is_available ? 'Online' : 'Offline';
+    let status = this.state.current.is_available ? 'Connected' : 'Disconnected';
     return (
       <span className={`instance-state-label ${status.toLowerCase()}`}>
         <Icon className={`instance-state instance-state--title ${status.toLowerCase()}`}
@@ -112,7 +112,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
         </Layout>
       );
     }
-
     return (
       <Layout {...this.props}>
         <h2>
@@ -127,6 +126,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
             <Icon name="trash-o" /> Remove
           </button>
         </h2>
+        <div className="last-updated-label text-muted small">Updated: {current.last_update || 'Never' }<br/><br/></div>
         {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
         <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
       </Layout>

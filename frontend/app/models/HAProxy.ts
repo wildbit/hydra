@@ -15,7 +15,8 @@ export class HAProxyInstance {
     display_name: string
     is_available = null;
     has_loaded = false;
-    
+    last_update = null;
+
     get key():string {
         return `${this.display_name}~${this.settings.url}`
     }
@@ -78,6 +79,7 @@ export class HAProxyInstance {
             });
             this.proxies = newProxies;
             this.has_loaded = true;
+            this.last_update = new Date().toLocaleTimeString();
             Store.instance.TriggerUpdate();
             return this.proxies;
         }
