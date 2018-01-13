@@ -108,8 +108,9 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     if (instances.length == 0) {
       return (
         <Layout {...this.props} hideSidebar={true}>
-          <div className="text-center container align-items-center">
-            <div className="col">
+          <br/>  
+          <div className="container text-center card alert-secondary alert">
+            <div className="">
               <p>
               This interface has not been configured to manage any HAProxy instances.
               </p>
