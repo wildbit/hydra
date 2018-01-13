@@ -10,7 +10,7 @@ import { Icon } from 'components/Icon';
 import Status from 'components/Status';
 
 const Server = ({ server, onStatusChanged, onWeightChanged }) => {
-  let status = <Icon className={`instance-state ${server.status.toLowerCase() === 'up' ? 'online': 'offline'}`}
+  let statusIndicator = <Icon className={`instance-state ${server.status.toLowerCase() === 'up' ? 'online': 'offline'}`}
                      name="circle" />
 
   return (
@@ -19,7 +19,7 @@ const Server = ({ server, onStatusChanged, onWeightChanged }) => {
       data-server-id={server.service_id}>
       <td>
         <span data-toggle="tooltip" data-placement="top" title="Tooltip on top">
-          {status}{server.service_name}
+          {statusIndicator} { server.status } {server.service_name}
         </span>
       </td>
       <td><Weight onChange={onWeightChanged} server={server} /></td>

@@ -21,12 +21,12 @@ const enhance = compose(
 );
 
 const active = (isActive) => {
-  return isActive ? 'active' : '';
+  return isActive ? 'btn-primary' : 'btn-outline-primary';
 };
 
 const Status = ({ server, handleOnClick }) => {
-  let { status } = server;
-  let states = ['drain', 'main', 'ready'];
+  let { normalized_status, haproxyInstance } = server;
+  let states = ['drain', 'maint', 'ready'];
 
   return (
     <div className="btn-group btn-group-sm pull-right" role="group" aria-label="Status">
@@ -37,7 +37,8 @@ const Status = ({ server, handleOnClick }) => {
               key={s}
               type="button"
               onClick={handleOnClick}
-              className={`text-uppercase btn btn-secondary ${active(status === s)}`.trim()}
+              disabled={ !haproxyInstance.is_available }
+              className={`text-uppercase btn ${active(normalized_status === s)}`}
               value={s}>
               {s}
             </button>

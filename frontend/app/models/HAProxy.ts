@@ -137,7 +137,14 @@ class ProxyComponent {
     get http_responses_4xx():number { return this.stats.hrsp_4xx;}
     get http_responses_5xx():number { return this.stats.hrsp_5xx;}
     get http_responses_other():number { return this.stats.hrsp_other;}
-    get mode():string { return this.stats.mode; }
+    get mode(): string { return this.stats.mode; }
+    
+    get normalized_status() {
+        var s = this.status;
+        if (/^maint/i.test(s)) return 'maint';
+        if (/^drain/i.test(s)) return 'drain';
+        return 'ready';
+    }
 }
 
 export class Proxy {
@@ -153,6 +160,9 @@ export class Proxy {
     get is_listener() { return this._listeners.length > 0 && this.type == 1 }
     get is_simple_frontend() { return this.type == 0 && this._servers.length == 0 }
     get is_simple_backend() { return this.type == 1 && this._listeners.length == 0 }
+    get max_sessions() { return this.stats.smax; }
+    get current_sessions() { return this.stats.scur; }
+    get status() { return this.stats.status; }
 
     get servers(): Server[]{
         return this._servers;
@@ -303,6 +313,7 @@ export class Server extends ProxyComponent{
     async SetStatus(status: string): Promise<void>{
         let name = this.server_identifier;
         try {
+            debugger;
             status = ["maint", "drain", "ready"]
                 .find(k => status.trim().toLowerCase() == k);
             if (status) {
@@ -313,6 +324,7 @@ export class Server extends ProxyComponent{
                     sid: this.server_id,
                     mode: status
                 });
+                this.stats = status;
                 Store.instance.TriggerUpdate();
             } 
         } catch{
