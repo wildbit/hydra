@@ -4,7 +4,7 @@ import * as generate from 'project-name-generator';
 
 const About = (props) => {
   return (
-    <Layout {...props}>
+    <Layout {...props} hideSidebar >
       <div className="container">
         <br />
         <h2>This is Hydra.</h2>

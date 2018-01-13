@@ -103,12 +103,34 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   render() {
-    let { current } = this.state;
+    let { current, instances } = this.state;
 
-    if (!current) {
+    if (instances.length == 0) {
+      return (
+        <Layout {...this.props} hideSidebar={true}>
+          <div className="text-center container align-items-center">
+            <div className="col">
+              <p>
+              This interface has not been configured to manage any HAProxy instances.
+              </p>
+              <button
+                type="button"
+                className="btn btn-success"
+                data-toggle="modal"
+                data-target="#create-instance">
+                <Icon name="plus-circle" /> Add HAProxy Instance
+              </button>
+            </div>  
+          </div>  
+        </Layout>
+      );  
+    }
+    else if (!current) {
       return (
         <Layout {...this.props}>
-          <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
+          <div className="text-center">
+             To view details, select one of the instances 
+          </div>
         </Layout>
       );
     }
