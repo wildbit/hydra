@@ -26,8 +26,7 @@ const Server = ({ server, onStatusChanged, onWeightChanged }) => {
       data-proxy-id={server.proxy_id}
       data-server-id={server.service_id}>
       <td>
-        <span data-toggle="tooltip" data-placement="top" title="Tooltip on top">
-          {statusIndicator} {server.service_name}</span>
+        <span>{statusIndicator} {server.service_name}</span>
       </td>
       <td className="text-center">{server.current_sessions}</td>
       <td className="text-center"><Weight onChange={onWeightChanged} server={server} /></td>
