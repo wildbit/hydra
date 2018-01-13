@@ -29,7 +29,8 @@ const Servers = ({ children }) => (
     <thead>
       <tr>
         <th>Server</th>
-        <th>Weight</th>
+        <th className="text-center">Current Sessions</th>
+        <th className="text-center">Weight</th>
         <th></th>
       </tr>
     </thead>
