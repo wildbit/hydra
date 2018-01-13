@@ -441,7 +441,7 @@ function process_request(applet)
 			result.weight = server:get_weight()
 		end
 		send_response(applet, result)
-	elseif applet.path == '/api//server/set-mode' and applet.method == 'POST' then
+	elseif applet.path == '/api/server/set-mode' and applet.method == 'POST' then
 		local command = json.decode(applet:receive())
 		local server = find_server(command)
 		local result = { success = false }
@@ -450,12 +450,12 @@ function process_request(applet)
 			if mode == 'maint' then
 				server:set_maint()
 			elseif mode == 'drain' then
-				server:set_draining()
+				server:set_drain()
 			elseif mode == 'ready' then
 				server:set_ready()
 			end
-			result.success = true
-		end
+      result.success = true
+    end
 		send_response(applet, result)
 	elseif applet.method == 'OPTIONS' then
 		applet:set_status(200)
