@@ -130,11 +130,22 @@ export default class HomePage extends React.Component { // eslint-disable-line r
       return (
         <Layout {...this.props}>
           <div className="text-center">
-             To view details, select one of the instances 
+             To view details, select one of the instances from the sidebar.
           </div>
         </Layout>
       );
     }
+
+    let availableState;
+    if (!current.is_available && current.last_update == null) {
+      availableState = <div className="alert alert-warning text-center">
+        <strong><Icon name="chain-broken"/> We haven't been able to connect to this HAProxy instance yet.</strong><br/>
+        Perhaps you need to start a VPN connection or open up an SSH Tunnel to the server?
+      </div>;
+    } else {
+      availableState = current.proxies.map((proxy) => this.mapProxyToComponent(proxy));
+    }
+
     return (
       <Layout {...this.props}>
         <h2>
@@ -149,8 +160,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
             <Icon name="trash-o" /> Remove
           </button>
         </h2>
-        <div className="last-updated-label text-muted small">Updated: {current.last_update || 'Never' }<br/><br/></div>
-        {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
+        <div className="last-updated-label text-muted small">Updated: {current.last_update || 'Never'}<br /><br /></div>
+        {availableState}
         <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
       </Layout>
     );
