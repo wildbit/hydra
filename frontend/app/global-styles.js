@@ -125,8 +125,8 @@ injectGlobal`
       font-weight: bold;
 
       .badge-count {
-        // background-color: #007bff;
-        // color: #FFF;
+        background-color: #007bff;
+        color: #FFF;
       }
     }
 
@@ -176,12 +176,12 @@ injectGlobal`
   }
 
   .badge-count {
-    // border:2px solid #f6f7fb;
-    // border-radius: 15px;
-    // padding: 0 10px;
-    // color: grey;
-    // font-size: 12px;
-    // vertical-align: 1px;
+    border:2px solid #f6f7fb;
+    border-radius: 15px;
+    padding: 0 10px;
+    color: grey;
+    font-size: 12px;
+    vertical-align: 1px;
   }
 
   /* Sidebar */
