@@ -32,7 +32,7 @@ const Weight = enhance(({ server, state, handleOnChange, handleOnAfterChange }) 
       value={weight}
       onChange={handleOnChange}
       disabled={ !server.haproxyInstance.is_available }
-      onAfterChange={handleOnAfterChange}
+      onAfterChange={ handleOnAfterChange }
       trackStyle={[{'background-color': '#4bd495'}]}
       handleStyle={[{'border-color': '#4bd495'}]} />
   );

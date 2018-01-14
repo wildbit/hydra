@@ -16,9 +16,9 @@ const BlankState = styled.p`
 `;
 
 
-const NullServers = () => {
+const NullServers = ({ simple_frontend }) => {
   return (
-    <BlankState>
+    <BlankState hidden={simple_frontend} >
       <Icon name="server" /><br/>No servers found
     </BlankState>
   );
