@@ -24,9 +24,15 @@ const Title = styled.h4`
 
 function getIconType(model) {
   //if the model is a listener, then let's indicate that right away.
-  if (model.is_listener) { return { name: "arrows-h", title: "Listener (Frontend + Backends)" }; }
+  if (model.is_listener) { return { name: "arrows-h", title: `Listener (Frontend + Backends) - ${model.status} `}; }
   else if (model.is_simple_frontend) { return { name: "long-arrow-right", title: "Frontend" }; }
   else if (model.is_simple_backend) { return { name: "long-arrow-left", title: "Backend" }; }
+}
+
+function getStatusIndicator(model) {
+  if (/^(up)|(open)/i.test(model.status)) return 'text-success';
+  if (/^down/i.test(model.status)) return 'text-danger';
+  return 'text-muted';
 }
 
 const Proxy = ({ model, children }) => {
@@ -34,7 +40,7 @@ const Proxy = ({ model, children }) => {
   return (
     <ProxyContainer>
       <Title>
-        <Icon name={icon.name} title={icon.title} className="text-muted" />&nbsp;
+        <Icon name={icon.name} title={icon.title} className={getStatusIndicator(model)} />&nbsp;
         {model.name} <span className="badge-count">{children.props.children.length}</span></Title>
       <ul>
         <li>Status: {model.status}</li>

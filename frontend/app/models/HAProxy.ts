@@ -77,7 +77,11 @@ export class HAProxyInstance {
                 else { c = new Proxy(this, k); }
                 newProxies.push(new Proxy(this, k));
             });
-            this.proxies = newProxies;
+            this.proxies = newProxies.sort((k, b) => {
+                if (k.proxy_id === b.proxy_id) return 0;
+                if (k.proxy_id < b.proxy_id) return -1;
+                if (k.proxy_id > b.proxy_id) return 1;
+            });;
             this.has_loaded = true;
             this.last_update = new Date().toLocaleTimeString();
             Store.instance.TriggerUpdate();
@@ -196,7 +200,11 @@ export class Proxy {
             }
             newServers.push(server);
         });
-        this._servers = newServers;
+        this._servers = newServers.sort((k, b) => {
+            if (k.service_id === b.service_id) return 0;
+            if (k.service_id < b.service_id) return -1;
+            if (k.service_id > b.service_id) return 1;
+        });
         this._listeners = apiData.listeners || [];
     }
 }
