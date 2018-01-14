@@ -30,6 +30,8 @@ const Servers = ({ children }) => (
       <tr>
         <th>Server</th>
         <th className="text-center">Current Sessions</th>
+        {/* <th className="text-center">Status</th> */}
+        <th className="text-center">Downtime</th>
         <th className="text-center">Weight</th>
         <th></th>
       </tr>

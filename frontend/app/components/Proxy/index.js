@@ -30,9 +30,12 @@ function getIconType(model) {
 }
 
 function getStatusIndicator(model) {
-  if (/^(up)|(open)/i.test(model.status)) return 'text-success';
-  if (/^down/i.test(model.status)) return 'text-danger';
-  return 'text-muted';
+  switch (model.normalized_status) {
+    case 'available': return 'text-success';
+    case 'down': return 'text-danger';
+    case 'other': return 'text-warning';
+    default: return '';
+  }
 }
 
 const Proxy = ({ model, children }) => {
@@ -46,6 +49,7 @@ const Proxy = ({ model, children }) => {
         <li>Status: {model.status}</li>
         <li>Current Sessions: {model.current_sessions}</li>
         <li>Max Sessions: {model.max_sessions}</li>
+        <li>Listener Count: {model._listeners.length}</li>
       </ul>
       {children}
     </ProxyContainer>

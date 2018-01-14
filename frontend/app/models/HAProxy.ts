@@ -151,6 +151,12 @@ class ProxyComponent {
     }
 }
 
+enum ProxyStatus {
+    available = 'available',
+    down = 'down',
+    other = 'other'
+}
+
 export class Proxy {
     private stats:any;
     private _servers: Server[] = [];
@@ -167,6 +173,11 @@ export class Proxy {
     get max_sessions() { return this.stats.smax; }
     get current_sessions() { return this.stats.scur; }
     get status() { return this.stats.status; }
+    get normalized_status() {
+        if (/^(up)|(open)/i.test(this.stats.status)) return ProxyStatus.available;
+        else if (/^down/i.test(this.stats.status)) return ProxyStatus.down;
+        else return ProxyStatus.other;
+    }
 
     get servers(): Server[]{
         return this._servers;
@@ -321,7 +332,6 @@ export class Server extends ProxyComponent{
     async SetStatus(status: string): Promise<void>{
         let name = this.server_identifier;
         try {
-            debugger;
             status = ["maint", "drain", "ready"]
                 .find(k => status.trim().toLowerCase() == k);
             if (status) {
