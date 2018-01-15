@@ -340,7 +340,7 @@ export class Server extends ProxyComponent{
                     sid: this.server_id,
                     mode: status
                 });
-                this.stats = status;
+                this.stats.status = status;
                 Store.instance.TriggerUpdate();
             } 
         } catch{
