@@ -148,10 +148,10 @@ injectGlobal`
 
   .instance-state-label,
   .instance-state {
-    &.online {
+    &.connected, &.online {
       color: #4bd496;
     }
-    &.offline {
+    &.disconnected, &.offline {
       color: #fe6e43;
     }
   }
@@ -216,5 +216,4 @@ injectGlobal`
       }
     }
   }
-
 `;

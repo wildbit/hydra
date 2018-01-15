@@ -16,13 +16,19 @@ const Instance = (i) => {
   }
 
   let count = '';
-  if (i.is_available) {
-    count = <span className="badge-count">{i.proxies.length}</span>
+  if (i.has_loaded) {
+    var availableProxies = i.proxies.filter(f => f.normalized_status == 'available').length;
+    var totalProxies = i.proxies.length;
+    let coloring = availableProxies == totalProxies ? 'success' : 'warning';
+    let classes = 'pull-right badge badge-pill'
+    if (i.isCurrent) { classes = `${classes} badge-${coloring}`; }
+    else { classes = `${classes} text-${coloring} border-${coloring} border border-${coloring}`; }
+    count = <span className={classes} tooltip='Proxies Available'>{availableProxies}/{totalProxies}</span>
   }
   return (
     <li className="nav-item" >
       <Link className={`nav-link instance-item ${i.isCurrent ? 'disabled' : ''}`} to={`/${i.display_name}`}>
-        <Icon className={`instance-state ${i.is_available ? 'online': 'offline'}`} name="circle" />
+        <Icon className={`instance-state ${i.is_available ? 'connected': 'disconnected'}`} name="circle" />
         <span>{i.display_name}</span>
         &nbsp;{pending}
         {count}

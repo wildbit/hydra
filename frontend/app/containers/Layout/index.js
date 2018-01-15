@@ -63,8 +63,7 @@ export default class Layout extends React.Component { // eslint-disable-line rea
 
   render() {
     let { current } = this.state;
-    const { children } = this.props;
-
+    const { children, hideSidebar } = this.props;
     return (
       <div>
         <Header>
@@ -76,7 +75,7 @@ export default class Layout extends React.Component { // eslint-disable-line rea
         </Header>
         <main role="main" className="container-fluid">
           <div className="row flex-xl-nowrap">
-            <Sidebar>
+            <Sidebar hidden={hideSidebar}>
               <Instances {...this.state} />
               <div className="controls">
                 <button
@@ -88,7 +87,7 @@ export default class Layout extends React.Component { // eslint-disable-line rea
                 </button>
               </div>
             </Sidebar>
-            <View>
+            <View fullScreen={hideSidebar} >
               {children}
               <footer className="text-muted small text-center">
                 &copy; Wildbit, LLC { new Date().getFullYear() }

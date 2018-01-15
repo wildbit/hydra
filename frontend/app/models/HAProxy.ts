@@ -15,7 +15,8 @@ export class HAProxyInstance {
     display_name: string
     is_available = null;
     has_loaded = false;
-    
+    last_update = null;
+
     get key():string {
         return `${this.display_name}~${this.settings.url}`
     }
@@ -74,8 +75,13 @@ export class HAProxyInstance {
                 else { c = new Proxy(this, k); }
                 newProxies.push(new Proxy(this, k));
             });
-            this.proxies = newProxies;
+            this.proxies = newProxies.sort((k, b) => {
+                if (k.proxy_id === b.proxy_id) return 0;
+                if (k.proxy_id < b.proxy_id) return -1;
+                if (k.proxy_id > b.proxy_id) return 1;
+            });;
             this.has_loaded = true;
+            this.last_update = new Date().toLocaleTimeString();
             Store.instance.TriggerUpdate();
             return this.proxies;
         }
@@ -133,17 +139,43 @@ class ProxyComponent {
     get http_responses_4xx():number { return this.stats.hrsp_4xx;}
     get http_responses_5xx():number { return this.stats.hrsp_5xx;}
     get http_responses_other():number { return this.stats.hrsp_other;}
-    get mode():string { return this.stats.mode; }
+    get mode(): string { return this.stats.mode; }
+    
+    get normalized_status() {
+        var s = this.status;
+        if (/^maint/i.test(s)) return 'maint';
+        if (/^drain/i.test(s)) return 'drain';
+        return 'ready';
+    }
+}
+
+enum ProxyStatus {
+    available = 'available',
+    down = 'down',
+    other = 'other'
 }
 
 export class Proxy {
     private stats:any;
     private _servers: Server[] = [];
-    
+    private _listeners: any[] = [];
+
     haproxyInstance: HAProxyInstance;
 
     get name(): string { return this.stats.pxname; }
     get proxy_id() { return this.stats.iid; }
+    get type():number { return this.stats.type; }
+    get is_listener() { return this._listeners.length > 0 && this.type == 1 }
+    get is_simple_frontend() { return this.type == 0 && this._servers.length == 0 }
+    get is_simple_backend() { return this.type == 1 && this._listeners.length == 0 }
+    get max_sessions() { return this.stats.smax; }
+    get current_sessions() { return this.stats.scur; }
+    get status() { return this.stats.status; }
+    get normalized_status() {
+        if (/^(up)|(open)/i.test(this.stats.status)) return ProxyStatus.available;
+        else if (/^down/i.test(this.stats.status)) return ProxyStatus.down;
+        else return ProxyStatus.other;
+    }
 
     get servers(): Server[]{
         return this._servers;
@@ -156,6 +188,7 @@ export class Proxy {
         this.haproxyInstance = haproxy;
         this.stats = apiData.stats;
         this._servers = apiData.servers.map(k => new Server(this, k));
+        this._listeners = apiData.listeners || [];
     }
 
     UpdateData(apiData: any) {
@@ -176,7 +209,12 @@ export class Proxy {
             }
             newServers.push(server);
         });
-        this._servers = newServers;
+        this._servers = newServers.sort((k, b) => {
+            if (k.service_id === b.service_id) return 0;
+            if (k.service_id < b.service_id) return -1;
+            if (k.service_id > b.service_id) return 1;
+        });
+        this._listeners = apiData.listeners || [];
     }
 }
 
@@ -302,7 +340,7 @@ export class Server extends ProxyComponent{
                     sid: this.server_id,
                     mode: status
                 });
-                console.log('UPDATE TRIGGERED');
+                this.stats = status;
                 Store.instance.TriggerUpdate();
             } 
         } catch{

@@ -21,20 +21,12 @@ const enhance = compose(
   })
 );
 
-const active = ({ current, status }) => {
-  if (status === 'ready') {
-    return (Up.indexOf(current.toLowerCase()) !== -1 || current === status) ? 'active' : '';
-  }
-
-  if (status === 'maint') {
-    return (Down.indexOf(current.toLowerCase()) !== -1 || current === status) ? 'active' : '';
-  }
-
-  return (current === status) ? 'active' : '';
+const active = (isActive) => {
+  return isActive ? 'btn-primary' : 'btn-outline-primary';
 };
 
 const Status = ({ server, handleOnClick }) => {
-  let { status } = server;
+  let { normalized_status, haproxyInstance } = server;
   let states = ['drain', 'maint', 'ready'];
 
   return (
@@ -46,7 +38,8 @@ const Status = ({ server, handleOnClick }) => {
               key={s}
               type="button"
               onClick={handleOnClick}
-              className={`text-uppercase btn btn-secondary ${active({ current: status, status: s })}`.trim()}
+              disabled={ !haproxyInstance.is_available }
+              className={`text-uppercase btn ${active(normalized_status === s)}`}
               value={s}>
               {s}
             </button>

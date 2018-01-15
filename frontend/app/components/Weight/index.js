@@ -24,14 +24,15 @@ const enhance = compose(
 );
 
 const Weight = enhance(({ server, state, handleOnChange, handleOnAfterChange }) => {
-  let { weight } = state;
+  let weight = state.weight || server.weight;
   return (
     <SliderWithTooltip
       min={0}
       max={256}
-      value={weight || server.weight}
+      value={weight}
       onChange={handleOnChange}
-      onAfterChange={handleOnAfterChange}
+      disabled={ !server.haproxyInstance.is_available }
+      onAfterChange={ handleOnAfterChange }
       trackStyle={[{'background-color': '#4bd495'}]}
       handleStyle={[{'border-color': '#4bd495'}]} />
   );

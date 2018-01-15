@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 // Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
 // 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
@@ -102,6 +103,10 @@ module.exports = (options) => ({
       },
     }),
     new webpack.NamedModulesPlugin(),
+    new CopyWebpackPlugin([{
+      from: '../backend/config/instance_manager.lua',
+      to: 'public'
+    }]),
   ]),
   resolve: {
     modules: ['app', 'node_modules'],

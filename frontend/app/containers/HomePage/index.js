@@ -59,8 +59,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   mapProxyToComponent = (proxy) => {
     return (
-      <Proxy name={proxy.name} key={proxy.key}>
-        <ServerList>
+      <Proxy model={proxy} key={proxy.key}>
+        <ServerList simple_frontend={ proxy.is_simple_frontend }>
           {proxy.servers.map(server => this.mapServerToComponent(server))}
         </ServerList>
       </Proxy>
@@ -93,7 +93,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   renderStatusIcon = () => {
-    let status = this.state.current.is_available ? 'Online' : 'Offline';
+    let status = this.state.current.is_available ? 'Connected' : 'Disconnected';
     return (
       <span className={`instance-state-label ${status.toLowerCase()}`}>
         <Icon className={`instance-state instance-state--title ${status.toLowerCase()}`}
@@ -104,14 +104,47 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   render() {
-    let { current } = this.state;
+    let { current, instances } = this.state;
 
-    if (!current) {
+    if (instances.length == 0) {
+      return (
+        <Layout {...this.props} hideSidebar={true}>
+          <br/>  
+          <div className="container text-center card alert-secondary alert">
+            <div className="">
+              <p>
+              This interface has not been configured to manage any HAProxy instances.
+              </p>
+              <button
+                type="button"
+                className="btn btn-success"
+                data-toggle="modal"
+                data-target="#create-instance">
+                <Icon name="plus-circle" /> Add HAProxy Instance
+              </button>
+            </div>  
+          </div>  
+        </Layout>
+      );  
+    }
+    else if (!current) {
       return (
         <Layout {...this.props}>
-          <p>No HAProxy Instance Selected. Please select one from the list on the left.</p>
+          <div className="text-center">
+             To view details, select one of the instances from the sidebar.
+          </div>
         </Layout>
       );
+    }
+
+    let availableState;
+    if (!current.is_available && current.last_update == null) {
+      availableState = <div className="alert alert-warning text-center">
+        <strong><Icon name="chain-broken"/> We haven't been able to connect to this HAProxy instance yet.</strong><br/>
+        Perhaps you need to start a VPN connection or open up an SSH Tunnel to the server?
+      </div>;
+    } else {
+      availableState = current.proxies.map((proxy) => this.mapProxyToComponent(proxy));
     }
 
     return (
@@ -128,7 +161,8 @@ export default class HomePage extends React.Component { // eslint-disable-line r
             <Icon name="trash-o" /> Remove
           </button>
         </h2>
-        {current.proxies.map((proxy) => this.mapProxyToComponent(proxy))}
+        <div className="last-updated-label text-muted small">Updated: {current.last_update || 'Never'}<br /><br /></div>
+        {availableState}
         <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
       </Layout>
     );

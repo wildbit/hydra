@@ -7,6 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Icon } from 'components/Icon';
 
 const ProxyContainer = styled.div`
   border-radius: 5px;
@@ -21,10 +22,35 @@ const Title = styled.h4`
   margin: 1.5rem;
 `;
 
-const Proxy = ({ name, children }) => {
+function getIconType(model) {
+  //if the model is a listener, then let's indicate that right away.
+  if (model.is_listener) { return { name: "arrows-h", title: `Listener (Frontend + Backends) - ${model.status} `}; }
+  else if (model.is_simple_frontend) { return { name: "long-arrow-right", title: "Frontend" }; }
+  else if (model.is_simple_backend) { return { name: "long-arrow-left", title: "Backend" }; }
+}
+
+function getStatusIndicator(model) {
+  switch (model.normalized_status) {
+    case 'available': return 'text-success';
+    case 'down': return 'text-danger';
+    case 'other': return 'text-warning';
+    default: return '';
+  }
+}
+
+const Proxy = ({ model, children }) => {
+  let icon = getIconType(model);
   return (
     <ProxyContainer>
-      <Title>{name} <span className="badge-count">{children.props.children.length}</span></Title>
+      <Title>
+        <Icon name={icon.name} title={icon.title} className={getStatusIndicator(model)} />&nbsp;
+        {model.name} <span className="badge-count">{children.props.children.length}</span></Title>
+      <ul>
+        <li>Status: {model.status}</li>
+        <li>Current Sessions: {model.current_sessions}</li>
+        <li>Max Sessions: {model.max_sessions}</li>
+        <li>Listener Count: {model._listeners.length}</li>
+      </ul>
       {children}
     </ProxyContainer>
   );

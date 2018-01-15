@@ -16,9 +16,9 @@ const BlankState = styled.p`
 `;
 
 
-const NullServers = () => {
+const NullServers = ({ simple_frontend }) => {
   return (
-    <BlankState>
+    <BlankState hidden={simple_frontend} >
       <Icon name="server" /><br/>No servers found
     </BlankState>
   );
@@ -29,7 +29,10 @@ const Servers = ({ children }) => (
     <thead>
       <tr>
         <th>Server</th>
-        <th>Weight</th>
+        <th className="text-center">Current Sessions</th>
+        {/* <th className="text-center">Status</th> */}
+        <th className="text-center">Downtime</th>
+        <th className="text-center">Weight</th>
         <th></th>
       </tr>
     </thead>
