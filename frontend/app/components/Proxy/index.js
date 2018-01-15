@@ -45,13 +45,7 @@ const Proxy = ({ model, children }) => {
       <Title>
         <Icon name={icon.name} title={icon.title} className={getStatusIndicator(model)} />&nbsp;
         {model.name} <span className="badge-count">{children.props.children.length}</span></Title>
-      <ul>
-        <li>Status: {model.status}</li>
-        <li>Current Sessions: {model.current_sessions}</li>
-        <li>Max Sessions: {model.max_sessions}</li>
-        <li>Listener Count: {model._listeners.length}</li>
-      </ul>
-      {children}
+        {children}
     </ProxyContainer>
   );
 }
