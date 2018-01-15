@@ -31,10 +31,11 @@ function humanTimeDuration(duration) {
 }
 
 const Server = ({ server, onStatusChanged, onWeightChanged }) => {
-  let statusIndicator = <Icon className={`instance-state ${getStatus(server.status)}`}
-                     name="circle" title={ server.status } />
-
-  console.log('SERVER -', server.proxy.name, server.service_name, 'status', server.status.toLowerCase());
+  const statusIndicator = (<Icon
+    className={`instance-state ${getStatus(server.status)}`}
+    name="circle"
+    title={server.status}
+  />);
 
   return (
     <tr>

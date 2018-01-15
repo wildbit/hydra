@@ -3,6 +3,31 @@ import * as papaparse from 'papaparse';
 import Store from './Store';
 import { groupBy } from './Helpers';
 
+interface IUpdatable {
+    key: any;
+    UpdateData(apiData:any);
+}
+
+function mergeInstances<T extends IUpdatable>(current: T[],
+    newElements: any[], instantiator: (any) => T): T[] {
+    
+    let retval: T[] = [];
+    let oldElements = {};
+    current.forEach(k => oldElements[k.key] = k);
+    newElements.forEach(k => {
+        var c = oldElements[k.key];
+        if (c) { c.UpdateData(k); }
+        else { c = instantiator(k); }
+        retval.push(c);
+    });
+
+    return retval.sort((l, r) => { 
+        if (l.key < r.key) return -1;
+        else if (l.key == r.key) return 0;
+        else if (l.key > r.key) return 1;
+    });
+}
+
 export interface ConnectionSettings extends AxiosBasicCredentials {
     url: string
     timeout: number
@@ -64,22 +89,7 @@ export class HAProxyInstance {
     async Proxies(): Promise<Proxy[]> {
         try {
             let responses = await this.Query('stats');
-            var currentProxies = {};
-            this.proxies.forEach(k => {
-                currentProxies[k.proxy_id] = k
-            });
-            let newProxies = [];
-            responses.proxies.forEach(k => {
-                var c = currentProxies[k.stats.iid];
-                if (c) { c.UpdateData(k); }
-                else { c = new Proxy(this, k); }
-                newProxies.push(new Proxy(this, k));
-            });
-            this.proxies = newProxies.sort((k, b) => {
-                if (k.proxy_id === b.proxy_id) return 0;
-                if (k.proxy_id < b.proxy_id) return -1;
-                if (k.proxy_id > b.proxy_id) return 1;
-            });;
+            this.proxies = mergeInstances(this.proxies, responses.proxies, (k) => new Proxy(this, k));
             this.has_loaded = true;
             this.last_update = new Date().toLocaleTimeString();
             Store.instance.TriggerUpdate();
@@ -95,6 +105,7 @@ enum ProxyComponentType {
     backend,
     frontend,
     server,
+    listener,
     unknown
 }
 
@@ -155,7 +166,7 @@ enum ProxyStatus {
     other = 'other'
 }
 
-export class Proxy {
+export class Proxy implements IUpdatable {
     private stats:any;
     private _servers: Server[] = [];
     private _listeners: any[] = [];
@@ -177,45 +188,35 @@ export class Proxy {
         else return ProxyStatus.other;
     }
 
-    get servers(): Server[]{
-        return this._servers;
-    }
-    get key(): string {
-        return `${this.haproxyInstance.key}/${this.proxy_id}`;
-    }
+    get servers(): Server[]{ return this._servers; }
+    get key(): string { return `${this.haproxyInstance.key}/${this.proxy_id}`; }
+    get listeners(): Listener[]{ return this._listeners;}
 
     constructor(haproxy: HAProxyInstance, apiData:any) {
         this.haproxyInstance = haproxy;
         this.stats = apiData.stats;
         this._servers = apiData.servers.map(k => new Server(this, k));
-        this._listeners = apiData.listeners || [];
+        this._listeners = apiData.listeners.map(k=> new Listener(this, k));
     }
 
     UpdateData(apiData: any) {
         this.stats = apiData.stats;
-        //update servers with new data -- this is ham-fisted,
-        // a good version of this would merge the data into existing servers,
-        // removing old ones.
-        let allServers = {}
-        this._servers.forEach(s => allServers[s.service_id] = s);
-        let newServers:Server[] = []
+        this._servers =
+            mergeInstances(this._servers, apiData.servers, s => new Server(this, s))
         
-        apiData.servers.forEach(s => {
-            var server = allServers[s.sid];
-            if (server) {
-                server.UpdateData(s);
-            } else {
-                server = new Server(this, s);
-            }
-            newServers.push(server);
-        });
-        this._servers = newServers.sort((k, b) => {
-            if (k.service_id === b.service_id) return 0;
-            if (k.service_id < b.service_id) return -1;
-            if (k.service_id > b.service_id) return 1;
-        });
-        this._listeners = apiData.listeners || [];
+        this._listeners =
+            mergeInstances(this._listeners, apiData.listeners, s => new Listener(this, s));
     }
+}
+
+export class Listener extends ProxyComponent {
+    get component_type() { return ProxyComponentType.listener; }
+    get denied_requests(): number { return this.stats.dreq; }
+    get request_errors(): number { return this.stats.ereq; }
+    get server_id(): string { return this.stats.sid; }
+    get addr(): string { return this.stats.addr; }
+    get denied_tcp_connections(): string { return this.stats.dcon; }
+    get denied_tcp_sessions(): string { return this.stats.dses; }
 }
 
 export class Frontend extends ProxyComponent {
@@ -332,15 +333,20 @@ export class Server extends ProxyComponent{
         try {
             status = ["maint", "drain", "ready"]
                 .find(k => status.trim().toLowerCase() == k);
+            const originalStatus = this.status;
             if (status) {
                 Server.pendingOps.status[name] |= 0;
                 Server.pendingOps.status[name]++;
-                await this.haproxyInstance.SendCommand('server/set-mode',{
+                let result = await this.haproxyInstance.SendCommand('server/set-mode',{
                     iid: this.proxy_id,
                     sid: this.server_id,
                     mode: status
                 });
-                this.stats.status = status;
+                if (result.success) {
+                    this.stats.status = status;
+                } else {
+                    this.stats.status = originalStatus;
+                }
                 Store.instance.TriggerUpdate();
             } 
         } catch{

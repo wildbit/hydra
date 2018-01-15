@@ -156,7 +156,7 @@ injectGlobal`
     }
   }
 
-  .server-table {
+  .server-table, .listener-table {
     margin-bottom: 0;
 
     thead th {

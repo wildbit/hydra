@@ -88,7 +88,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   handleOnStatusChanged = ({ server, status }) => {
-    console.log(server.proxy.name, server.service_name, 'change status', 'from', server.status, 'to', status);
     server.SetStatus(status);
   }
 
