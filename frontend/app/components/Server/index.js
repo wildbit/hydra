@@ -31,11 +31,8 @@ function humanTimeDuration(duration) {
 }
 
 const Server = ({ server, onStatusChanged, onWeightChanged }) => {
-  const statusIndicator = (<Icon
-    className={`instance-state ${getStatus(server.status)}`}
-    name="circle"
-    title={server.status}
-  />);
+  let statusIndicator = <Icon className={`instance-state ${getStatus(server.status)}`}
+                     name="circle" title={ server.status } />
 
   return (
     <tr>

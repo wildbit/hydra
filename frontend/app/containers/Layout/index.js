@@ -12,10 +12,9 @@ import Header from 'components/Menu/Header';
 import Sidebar from 'components/Menu/Sidebar';
 import View from 'components/View';
 import Instances from 'components/Instances';
-import CreateInstance from 'components/Instances/Create'
+import Form from 'components/Instances/Form'
 import { Link } from 'react-router-dom';
 import { Icon } from 'components/Icon';
-
 
 export default class Layout extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -57,13 +56,14 @@ export default class Layout extends React.Component { // eslint-disable-line rea
     let newInstance = Store.instance.Add(instance.url, instance.name, instance.username, instance.password);
 
     if (newInstance) {
-      callback();
+      callback(true);
     }
   }
 
   render() {
     let { current } = this.state;
     const { children, hideSidebar } = this.props;
+
     return (
       <div>
         <Header>
@@ -93,7 +93,10 @@ export default class Layout extends React.Component { // eslint-disable-line rea
                 &copy; Wildbit, LLC { new Date().getFullYear() }
               </footer>
             </View>
-            <CreateInstance id="create-instance" onSubmit={this.handleOnInstanceCreated} />
+            <Form
+              id="create-instance"
+              title="Add HAProxy Instance"
+              onSubmit={this.handleOnInstanceCreated} />
           </div>
         </main>
       </div>
