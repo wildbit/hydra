@@ -5,93 +5,25 @@
 */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+import $ from 'jquery';
+
 import Modal from 'components/Modal';
 import Header from 'components/Modal/Header';
 import Title from 'components/Modal/Title';
 import Body from 'components/Modal/Body';
 import Footer from 'components/Modal/Footer';
-import Store from 'models/Store.ts';
-import { compose, withState, withHandlers } from 'recompose';
+import { branch, compose, withState, withHandlers, renderNothing } from 'recompose';
 import { InstanceValidator } from 'utils/validators/Instance';
-import $ from 'jquery';
 
-const Form = ({ id, current, title, state, setState, handleOnSubmit, handleOnCancel, handleOnChange }) => {
-  let { name, url, username, password, errors } = state;
-
-  return (
-    <form onSubmit={handleOnSubmit}>
-      <Modal id={id}>
-        <Header onClose={handleOnCancel}>
-          <Title>{title}</Title>
-        </Header>
-        <Body>
-          <div className="form-group">
-            <label htmlFor="Name">Name</label>
-            <input
-              type="text"
-              className={`form-control ${(errors.name || []).length > 0 ? 'is-invalid' : ''}`}
-              placeholder="production-proxy-01"
-              value={name}
-              data-field="name"
-              onChange={handleOnChange} />
-            <div className="invalid-feedback">
-              {(errors.name || []).map((e, i) => <span key={`name-${i}`}>{e}</span>)}
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="Url">Url</label>
-            <input
-              type="text"
-              className={`form-control ${(errors.url || []).length > 0 ? 'is-invalid' : ''}`}
-              placeholder="http://localhost:10000"
-              data-field="url"
-              value={url}
-              onChange={handleOnChange} />
-            <div className="invalid-feedback">
-              {(errors.url || []).map((e, i) => <span key={`url-${i}`}>{e}</span>)}
-            </div>
-          </div>
-          <div className="form-group">
-            <label htmlFor="Username">Username</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="administrator"
-              data-field="username"
-              value={username}
-              onChange={handleOnChange} />
-          </div>
-          <div className="form-group">
-            <label htmlFor="Password">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              placeholder="12345"
-              data-field="password"
-              value={password}
-              onChange={handleOnChange} />
-          </div>
-        </Body>
-        <Footer>
-          <button className="btn btn-primary">Save</button>
-          <a href="#" onClick={handleOnCancel} aria-label="Cancel">Cancel</a>
-        </Footer>
-      </Modal>
-    </form>
-  );
-}
-
-Form.propTypes = {
-};
-
-const defaultState = (current) => {
-  if (!current) { current = { settings: {} } }
+const defaultState = ({ name = '', url = '', username = '', password = '', errors = {} } = {}) => {
   return {
-    name: current.display_name || '',
-    url: current.settings.url || '',
-    username: current.settings.username || '',
-    password: current.settings.password || '',
-    errors: {}
+    name,
+    url,
+    username,
+    password,
+    errors
   };
 };
 
@@ -99,57 +31,175 @@ const any = (errors) => {
   return [].concat(...Object.keys(errors).map(k => errors[k])).length > 0;
 };
 
-const enhance = compose(
-  withState('state', 'setState', ({ current }) => {
-    console.log('INITIAL STATE', current);
-    return defaultState(current);
-  }),
-  withHandlers({
-    handleOnCancel: ({ id, current, setState }) => event => {
-      setState(defaultState(current));
-      $(`#${id}`).modal('hide');
-    },
-    handleOnChange: ({ current, state, setState }) => event => {
-      let $input = $(event.target);
-      let field = $input.data('field');
-      let value = event.target.value.trim();
-      let errors = InstanceValidator().validate({ current, field, value });
+export default class Form extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = defaultState();
+  }
 
-      delete state.errors[field];
+  componentDidMount() {
+    this.mapStateFromProps(this.props);
+    $(ReactDOM.findDOMNode(this)).on('hidden.bs.modal', this.handleOnCancel);
+  }
 
-      if (errors.length > 0) {
-        state.errors[field] = errors;
-      }
+  componentWillUnmount() {
+    $(ReactDOM.findDOMNode(this)).off('hidden.bs.modal', this.handleOnCancel);
+  }
 
-      state[field] = value;
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.current !== this.props.current) {
+      this.mapStateFromProps(nextProps);
+    }
+  }
 
-      setState(state);
-    },
-    handleOnSubmit: ({ id, current, onSubmit, state, setState }) => event => {
-      event.preventDefault();
+  mapStateFromProps = (props) => {
+    let { current } = props;
 
-      let validator = InstanceValidator();
-      let errors = {}
+    if (!current) {
+      return;
+    }
 
-      validator.fields.forEach(field => {
-        errors[field] = validator.validate({ current, field, value: state[field] });
-      });
+    let { display_name, settings } = current;
+    let { url, username, password } = settings;
 
-      if (any(errors)) {
-        state.errors = errors;
-        setState(state);
-        return;
-      }
+    this.setState(state => {
+      return {
+        ...state,
+        name: display_name,
+        url,
+        username,
+        password
+      };
+    })
+  }
 
-      onSubmit(state, (reset) => {
-        if (reset) {
-          setState(defaultState());
-        }
+  handleOnCancel = (event) => {
+    this.setState(defaultState());
+    this.mapStateFromProps(this.props);
+  }
 
-        $(`#${id}`).modal('hide');
-      });
-    },
-  })
+  handleOnChange = (event) => {
+    const { current } = this.props;
+
+    let { state } = this;
+    let field = ReactDOM.findDOMNode(event.target).getAttribute('data-field');
+    let value = event.target.value.trim();
+    let errors = InstanceValidator().validate({ current, field, value });
+
+    delete state.errors[field];
+    state[field] = value;
+
+    if (errors.length > 0) {
+      state.errors[field] = errors;
+    }
+
+    this.setState(state);
+  }
+
+  handleOnSubmit = (event) => {
+    event.preventDefault();
+
+    const { current, onSubmit } = this.props;
+
+    let { state } = this;
+    let validator = InstanceValidator();
+    let errors = {}
+
+    validator.fields.forEach(field => {
+      errors[field] = validator.validate({ current, field, value: state[field] });
+    });
+
+    if (any(errors)) {
+      state.errors = errors;
+      this.setState(state);
+      return;
+    }
+
+    onSubmit(state, () => {
+      this.setState(defaultState());
+      $(ReactDOM.findDOMNode(this)).modal('hide');
+    });
+  }
+
+  render() {
+    const { id, title } = this.props;
+    let { name, url, username, password, errors } =  this.state;
+
+    return (
+      <Modal id={id}>
+        <form onSubmit={this.handleOnSubmit}>
+          <Header>
+            <Title>{title}</Title>
+          </Header>
+          <Body>
+            <div className="form-group">
+              <label htmlFor="Name">Name</label>
+              <input
+                type="text"
+                className={`form-control ${(errors.name || []).length > 0 ? 'is-invalid' : ''}`}
+                placeholder="production-proxy-01"
+                value={name}
+                data-field="name"
+                onChange={this.handleOnChange} />
+              <Errors errors={errors.name} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Url">Url</label>
+              <input
+                type="text"
+                className={`form-control ${(errors.url || []).length > 0 ? 'is-invalid' : ''}`}
+                placeholder="http://localhost:10000"
+                data-field="url"
+                value={url}
+                onChange={this.handleOnChange} />
+              <Errors errors={errors.url} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Username">Username</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="administrator"
+                data-field="username"
+                value={username}
+                onChange={this.handleOnChange} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Password">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                placeholder="12345"
+                data-field="password"
+                value={password}
+                onChange={this.handleOnChange} />
+            </div>
+          </Body>
+          <Footer>
+            <button className="btn btn-primary">Save</button>
+            <a href="#" data-dismiss="modal" aria-label="Cancel">Cancel</a>
+          </Footer>
+        </form>
+      </Modal>
+    );
+  }
+}
+
+Form.propTypes = {
+  id: PropTypes.string,
+  title: PropTypes.string,
+  OnSubmit: PropTypes.func,
+};
+
+const enhanced = branch(
+  ({ errors }) => !errors,
+  renderNothing
 );
 
-export default enhance(Form);
+const Errors = enhanced(({ errors }) => {
+  return (
+    <div className="invalid-feedback">
+      {errors.map((e, i) => <span key={i}>{e}</span>)}
+    </div>
+  );
+});

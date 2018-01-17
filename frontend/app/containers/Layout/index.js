@@ -56,7 +56,7 @@ export default class Layout extends React.Component { // eslint-disable-line rea
     let newInstance = Store.instance.Add(instance.url, instance.name, instance.username, instance.password);
 
     if (newInstance) {
-      callback(true);
+      callback();
     }
   }
 

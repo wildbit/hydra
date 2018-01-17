@@ -12,7 +12,7 @@ import Slider, { createSliderWithTooltip } from 'rc-slider';
 const SliderWithTooltip = createSliderWithTooltip(Slider);
 
 const enhance = compose(
-  withState('state', 'setState', { weight: null }),
+  withState('state', 'setState', ({ server }) => ({ weight: server.weight || null })),
   withHandlers({
     handleOnChange: ({ setState }) => value => {
       setState({ weight: value });
@@ -24,7 +24,7 @@ const enhance = compose(
 );
 
 const Weight = enhance(({ server, state, handleOnChange, handleOnAfterChange }) => {
-  let weight = state.weight || server.weight;
+  let { weight } = state;
   return (
     <SliderWithTooltip
       min={0}
@@ -33,8 +33,8 @@ const Weight = enhance(({ server, state, handleOnChange, handleOnAfterChange }) 
       onChange={handleOnChange}
       disabled={ !server.haproxyInstance.is_available }
       onAfterChange={ handleOnAfterChange }
-      trackStyle={[{'background-color': '#4bd495'}]}
-      handleStyle={[{'border-color': '#4bd495'}]} />
+      trackStyle={[{'backgroundColor': '#4bd495'}]}
+      handleStyle={[{'borderColor': '#4bd495'}]} />
   );
 });
 
