@@ -48,6 +48,9 @@ const About = (props) => {
         &nbsp; acl lua_handling path_beg /api<br/>
         &nbsp; http-request deny unless lua_handling authenticated || lua_handling METH_OPTIONS || !lua_handling<br/>
         &nbsp; http-request use-service lua.instance_manager if lua_handling<br />
+        &nbsp; http-response set-header Allow-Origin *<br/>
+        &nbsp; http-response set-header Access-Control-Allow-Headers "Authorization, Content-Type, Accept"<br/>
+        &nbsp; http-response set-header Access-Control-Allow-Methods "POST, GET, OPTIONS"<br/>
         <br/>  
         &nbsp; # The following config is optional, but will make this interface available<br/>
         &nbsp; # by navigating to http://localhost:9005 on your HAProxy instance.<br/>
