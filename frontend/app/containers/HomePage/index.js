@@ -10,21 +10,23 @@
  */
 
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import $ from 'jquery';
 
 import Store from 'models/Store.ts'
 
 import Layout from 'containers/Layout';
 import Proxy from 'components/Proxy';
-import RemoveInstance from 'components/Instances/Remove'
 import ServerList from 'components/Servers';
 import Server from 'components/Server';
+import Form from 'components/Instances/Form'
+import Remove from 'components/Instances/Remove'
 import { Icon } from 'components/Icon';
 
 export default class HomePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = { instances: [], current: null };
+    this.state = { instances: [], current: null, redirect: null };
   }
 
   componentDidMount() {
@@ -44,24 +46,28 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   refresh = (instances) => {
-    this.setState({ instances: instances }, ()  => {
-      this.setCurrent();
+    this.setState({ instances }, ()  => {
+      this.setCurrent(this.props);
     });
   }
 
-  setCurrent = (nextProps) => {
-    let { instances }  = this.state;
-    let { params } = (nextProps || this.props).match;
+  setCurrent = (props) => {
+    let { instances, redirect }  = this.state;
+    let { params } = props.match;
     let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
 
-    this.setState({ current });
+    if (redirect && redirect.pathname.indexOf(params.key) !== -1) {
+      redirect = null;
+    }
+
+    this.setState({ current, redirect });
   }
 
   mapProxyToComponent = (proxy) => {
     return (
       <Proxy model={proxy} key={proxy.key}>
-        <ServerList simple_frontend={ proxy.is_simple_frontend }>
-          {proxy.servers.map(server => this.mapServerToComponent(server))}
+        <ServerList simple_frontend={proxy.is_simple_frontend}>
+          {proxy.servers.map(this.mapServerToComponent)}
         </ServerList>
       </Proxy>
     )
@@ -78,8 +84,19 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     );
   }
 
+  handleOnInstanceUpdated = (instance, callback) => {
+    let { current } = this.state;
+    let updated = Store.instance.Update(current, instance.url, instance.name, instance.username, instance.password);
+
+    if (updated) {
+      this.setState({ redirect: { pathname: `/${instance.name}` } });
+      callback();
+    }
+  }
+
   handleOnInstanceRemoved = (instance, callback) => {
     Store.instance.Remove(instance);
+    this.setState({ redirect: { pathname: '/' } });
     callback();
   }
 
@@ -91,63 +108,88 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     server.SetStatus(status);
   }
 
-  renderStatusIcon = () => {
-    let status = this.state.current.is_available ? 'Connected' : 'Disconnected';
+  renderRedirect = () => {
+    let { redirect } = this.state;
+
+    if (!redirect) {
+      return null;
+    }
+
     return (
-      <span className={`instance-state-label ${status.toLowerCase()}`}>
-        <Icon className={`instance-state instance-state--title ${status.toLowerCase()}`}
-              name="circle" />
-        {status}
-     </span>
-    )
+      <Redirect to={redirect} />
+    );
   }
 
-  render() {
-    let { current, instances } = this.state;
+  renderEmptyInstances = () => {
+    let { instances } = this.state;
 
-    if (instances.length == 0) {
-      return (
-        <Layout {...this.props} hideSidebar={true}>
-          <br/>  
-          <div className="container text-center card alert-secondary alert">
-            <div className="">
-              <p>
-              This interface has not been configured to manage any HAProxy instances.
-              </p>
-              <button
-                type="button"
-                className="btn btn-success"
-                data-toggle="modal"
-                data-target="#create-instance">
-                <Icon name="plus-circle" /> Add HAProxy Instance
-              </button>
-            </div>  
-          </div>  
-        </Layout>
-      );  
-    }
-    else if (!current) {
-      return (
-        <Layout {...this.props}>
-          <div className="text-center">
-             To view details, select one of the instances from the sidebar.
-          </div>
-        </Layout>
-      );
-    }
-
-    let availableState;
-    if (!current.is_available && current.last_update == null) {
-      availableState = <div className="alert alert-warning text-center">
-        <strong><Icon name="chain-broken"/> We haven't been able to connect to this HAProxy instance yet.</strong><br/>
-        Perhaps you need to start a VPN connection or open up an SSH Tunnel to the server?
-      </div>;
-    } else {
-      availableState = current.proxies.map((proxy) => this.mapProxyToComponent(proxy));
+    if (instances.length > 0) {
+      return null;
     }
 
     return (
-      <Layout {...this.props}>
+      <div>
+        <br/>
+        <div className="container text-center card alert-secondary alert">
+          <div>
+            <p>
+            This interface has not been configured to manage any HAProxy instances.
+            </p>
+            <button
+              type="button"
+              className="btn btn-success"
+              data-toggle="modal"
+              data-target="#create-instance">
+              <Icon name="plus-circle" /> Add HAProxy Instance
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderNullCurrentInstance = () => {
+    let { current } = this.state;
+
+    if (current)  {
+      return null;
+    }
+
+    return (
+      <div className="text-center">
+        To view details, select one of the instances from the sidebar.
+      </div>
+    );
+  }
+
+  renderUnavailableInstance = () => {
+    let { current } = this.state;
+
+    if (!current) {
+      return null;
+    }
+
+    if (current.is_available) {
+      return null;
+    }
+
+    return (
+      <div className="alert alert-warning text-center">
+        <strong><Icon name="chain-broken"/> We haven't been able to connect to this HAProxy instance yet.</strong><br/>
+        Perhaps you need to start a VPN connection or open up an SSH Tunnel to the server?
+      </div>
+    );
+  }
+
+  renderProxies = () => {
+    let { current } = this.state;
+
+    if (!current) {
+      return null;
+    }
+
+    return (
+      <div>
         <h2>
           <span>{current.display_name}</span>
           {this.renderStatusIcon()}
@@ -159,10 +201,54 @@ export default class HomePage extends React.Component { // eslint-disable-line r
             data-target="#remove-instance">
             <Icon name="trash-o" /> Remove
           </button>
+          <button
+            type="button"
+            className="btn btn-light text-secondary pull-right"
+            data-toggle="modal"
+            disabled={!current}
+            data-target="#update-instance">
+            <Icon name="pencil" /> Edit
+          </button>
         </h2>
         <div className="last-updated-label text-muted small">Updated: {current.last_update || 'Never'}<br /><br /></div>
-        {availableState}
-        <RemoveInstance id="remove-instance" onClick={this.handleOnInstanceRemoved} current={current} />
+        {this.renderUnavailableInstance()}
+        {current.proxies.map(this.mapProxyToComponent)}
+        <Form
+          id="update-instance"
+          title={`Update ${current.display_name}`}
+          current={current}
+          onSubmit={this.handleOnInstanceUpdated} />
+        <Remove
+          id="remove-instance"
+          onClick={this.handleOnInstanceRemoved}
+          current={current} />
+      </div>
+    );
+  }
+
+  renderStatusIcon = () => {
+    let { current } = this.state;
+    let status = current.is_available ? 'Connected' : 'Disconnected';
+
+    return (
+      <span className={`instance-state-label ${status.toLowerCase()}`}>
+        <Icon
+          className={`instance-state instance-state--title ${status.toLowerCase()}`}
+          name="circle" />
+        {status}
+     </span>
+    )
+  }
+
+  render() {
+    let { current, instances, redirect } = this.state;
+
+    return (
+      <Layout {...this.props} hideSidebar={instances.length === 0}>
+        {this.renderRedirect()}
+        {this.renderEmptyInstances()}
+        {this.renderNullCurrentInstance()}
+        {this.renderProxies()}
       </Layout>
     );
   }

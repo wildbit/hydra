@@ -7,31 +7,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Icon } from '../Icon';
+import { Icon } from 'components/Icon';
+import { Connection, Pending, ProxyBadge } from 'components/Instances/Icons';
 
-const Instance = (i) => {
-  let pending = '';
-  if (!i.has_loaded && i.is_available === null) {
-    pending = <Icon className="text-primary" name="circle-o-notch" spin />;
-  }
+const Instance = (haProxy) => {
+  let { proxies } = haProxy
+  let available = proxies.filter(proxy => proxy.normalized_status === 'available');
 
-  let count = '';
-  if (i.has_loaded) {
-    var availableProxies = i.proxies.filter(f => f.normalized_status == 'available').length;
-    var totalProxies = i.proxies.length;
-    let coloring = availableProxies == totalProxies ? 'success' : 'warning';
-    let classes = 'pull-right badge badge-pill'
-    if (i.isCurrent) { classes = `${classes} badge-${coloring}`; }
-    else { classes = `${classes} text-${coloring} border-${coloring} border border-${coloring}`; }
-    count = <span className={classes} tooltip='Proxies Available'>{availableProxies}/{totalProxies}</span>
-  }
   return (
-    <li className="nav-item" >
-      <Link className={`nav-link instance-item ${i.isCurrent ? 'disabled' : ''}`} to={`/${i.display_name}`}>
-        <Icon className={`instance-state ${i.is_available ? 'connected': 'disconnected'}`} name="circle" />
-        <span>{i.display_name}</span>
-        &nbsp;{pending}
-        {count}
+    <li className="nav-item">
+      <Link className={`nav-link instance-item ${haProxy.isCurrent ? 'disabled' : ''}`} to={`/${haProxy.display_name}`}>
+        <Connection {...haProxy} />
+        <span>{haProxy.display_name}</span>
+        &nbsp;<Pending {...haProxy} />
+        <ProxyBadge {...haProxy}>{available.length}/{proxies.length}</ProxyBadge>
       </Link>
     </li>
   );
