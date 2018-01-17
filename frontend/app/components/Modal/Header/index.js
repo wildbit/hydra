@@ -12,6 +12,7 @@ const Header = ({ children }) => {
       {children}
       <button
         type="button"
+        data-dismiss="modal"
         className="close"
         aria-label="Close">
         <span aria-hidden="true">&times;</span>

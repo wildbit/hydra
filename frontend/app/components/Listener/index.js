@@ -35,12 +35,16 @@ const Listener = ({ listener }) => {
 
 const Listeners = ({ listeners }) => {
   if (listeners.length == 0) { return null; }
-  return (<table className='table listener-table' >
-    <thead>
-      <tr><th>Listener</th><th>Mode</th><th>Current Sessions</th></tr>
-    </thead>
-    {listeners.map((k) => <Listener key={k.key} listener={k} />)}
-  </table>);
+  return (
+    <table className='table listener-table' >
+      <thead>
+        <tr><th>Listener</th><th>Mode</th><th>Current Sessions</th></tr>
+      </thead>
+      <tbody>
+        {listeners.map((k) => <Listener key={k.key} listener={k} />)}
+      </tbody>
+    </table>
+  );
 };
 
 export { Listener, Listeners };

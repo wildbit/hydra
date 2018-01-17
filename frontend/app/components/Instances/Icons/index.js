@@ -23,17 +23,17 @@ const SelectedBadge = (props) =>
 const UnSelectedBadge = (props) =>
   (<Badge background="text" {...props} />);
 
-const IsCurrentBadge = branch(
+const CurrentBadge = branch(
   ({ isCurrent }) => isCurrent,
   renderComponent(SelectedBadge),
   renderComponent(UnSelectedBadge)
 )(Badge);
 
 const SuccessBadge = (props) =>
-  (<IsCurrentBadge color="success" {...props} />);
+  (<CurrentBadge color="success" {...props} />);
 
 const WarningBadge = (props) =>
-  (<IsCurrentBadge color="warning" {...props} />);
+  (<CurrentBadge color="warning" {...props} />);
 
 export const ProxyBadge = compose(
   branch(
@@ -48,7 +48,7 @@ export const ProxyBadge = compose(
     renderComponent(SuccessBadge),
     renderComponent(WarningBadge)
   )
-)(IsCurrentBadge);
+)(CurrentBadge);
 
 const ConnectionIcon = ({ status }) =>
   (<Icon className={`instance-state ${status}`} name="circle" />)

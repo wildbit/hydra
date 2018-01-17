@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Icon } from 'components/Icon';
+import { ProxyIcon } from 'components/Proxy/Helpers';
 import { Listeners } from 'components/Listener';
 
 const ProxyContainer = styled.div`
@@ -39,29 +40,15 @@ function getStatusIndicator(model) {
   }
 }
 
-// const BlankState = styled.p`
-//   padding: 0 1.5rem 1rem;
-//   text-align: center;
-//   color: #afb2bb;
-// `;
-
-
-// const NullServers = ({ simple_frontend }) => {
-//   return (
-//     <BlankState hidden={simple_frontend} >
-//       <Icon name="server" /><br/>No servers found
-//     </BlankState>
-//   );
-// };
-
 const Proxy = ({ model, children }) => {
   let icon = getIconType(model);
 
   return (
     <ProxyContainer>
       <Title>
-      <Icon name={icon.name} title={icon.title} className={getStatusIndicator(model)} />&nbsp;
-        {model.name} <span className="badge-count">{model.servers.length}</span></Title>
+        <ProxyIcon model={model} className={getStatusIndicator(model)} data-toggle="tooltip" />&nbsp;
+        {model.name} <span className="badge-count">{model.servers.length}</span>
+      </Title>
       <Listeners listeners={ model.listeners } />
       {children}
     </ProxyContainer>

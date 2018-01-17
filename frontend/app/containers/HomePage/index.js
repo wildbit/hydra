@@ -46,14 +46,14 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   refresh = (instances) => {
-    this.setState({ instances: instances }, ()  => {
-      this.setCurrent();
+    this.setState({ instances }, ()  => {
+      this.setCurrent(this.props);
     });
   }
 
-  setCurrent = (nextProps) => {
+  setCurrent = (props) => {
     let { instances, redirect }  = this.state;
-    let { params } = (nextProps || this.props).match;
+    let { params } = props.match;
     let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
 
     if (redirect && redirect.pathname.indexOf(params.key) !== -1) {
@@ -227,12 +227,14 @@ export default class HomePage extends React.Component { // eslint-disable-line r
   }
 
   renderStatusIcon = () => {
-    let status = this.state.current.is_available ? 'Connected' : 'Disconnected';
+    let { current } = this.state;
+    let status = current.is_available ? 'Connected' : 'Disconnected';
 
     return (
       <span className={`instance-state-label ${status.toLowerCase()}`}>
-        <Icon className={`instance-state instance-state--title ${status.toLowerCase()}`}
-              name="circle" />
+        <Icon
+          className={`instance-state instance-state--title ${status.toLowerCase()}`}
+          name="circle" />
         {status}
      </span>
     )

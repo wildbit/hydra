@@ -42,8 +42,6 @@ const Servers = ({ children }) => (
   </table>
 );
 
-
-
 const enhance = compose(
   branch(
     ({ children }) => children.length === 0,
