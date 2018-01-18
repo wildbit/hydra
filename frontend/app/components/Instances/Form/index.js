@@ -39,11 +39,13 @@ export default class Form extends React.Component {
 
   componentDidMount() {
     this.mapStateFromProps(this.props);
-    $(ReactDOM.findDOMNode(this)).on('hidden.bs.modal', this.handleOnCancel);
+    $(ReactDOM.findDOMNode(this))
+      .on('hidden.bs.modal', this.handleOnCancel);
   }
 
   componentWillUnmount() {
-    $(ReactDOM.findDOMNode(this)).off('hidden.bs.modal', this.handleOnCancel);
+    $(ReactDOM.findDOMNode(this))
+      .off('hidden.bs.modal', this.handleOnCancel);
   }
 
   componentWillReceiveProps(nextProps) {

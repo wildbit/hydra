@@ -5,9 +5,6 @@
  * code.
  */
 
-// Needed for redux-saga es6 generator support
-import 'babel-polyfill';
-
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -37,8 +34,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'rc-slider/assets/index.css';
 import './global-styles';
 
-// Create redux store with history
-const initialState = {};
 const MOUNT_NODE = document.getElementById('app');
 
 const render = () => {

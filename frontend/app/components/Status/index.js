@@ -8,9 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
 import { compose, withHandlers } from 'recompose';
-import { Up, Down } from 'utils/Server';
-
-// import styled from 'styled-components';
 
 const enhance = compose(
   withHandlers({

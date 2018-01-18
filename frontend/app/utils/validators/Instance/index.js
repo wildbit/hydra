@@ -27,7 +27,7 @@ export const InstanceValidator = () => {
     'url': [
       {
         'validate': ({ value }) => {
-          const url = /^http(s)?:\/\/[a-z0-9.-]+([:][0-9]{1,5}($|\\|\/))?/i;
+          const url = /^http(s)?:\/\/[a-z0-9.-]+([:][0-9]{1,5}(\\|\/)?)?$/i;
           return url.test(value);
         },
         'message': 'This must be a valid http or https url.',

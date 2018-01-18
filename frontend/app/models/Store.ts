@@ -23,10 +23,13 @@ export default class Store{
     }
 
     public Add(url: string, display_name: string = null,
-        username: string = null, password: string = null, timeout:number = 5): HAProxyInstance {
+        username: string = null, password: string = null, timeout: number = 5): HAProxyInstance {
         let newInstance = new HAProxyInstance({
-            url, username, password,
-            timeout, display_name
+            url: url.replace(/(\\|\/)+$/,''),
+            username,
+            password,
+            timeout,
+            display_name
         });
         this.instances.push(newInstance);
         this.SaveInstances()
@@ -37,7 +40,8 @@ export default class Store{
         username: string = null, password: string = null, timeout:number = 5): HAProxyInstance {
         let index = this.instances.indexOf(instance);
         let newInstance = new HAProxyInstance({
-            url, username, password,
+            url: url.replace(/(\\|\/)+$/, ''),
+            username, password,
             timeout, display_name
         });
 
