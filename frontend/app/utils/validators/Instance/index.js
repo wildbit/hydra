@@ -1,5 +1,7 @@
 import Store from 'models/Store.ts';
 
+import { IllegalUrlCharacters as illegal } from 'utils/regular-expressions';
+
 export const InstanceValidator = () => {
   const rules = {
     'name': [
@@ -19,7 +21,13 @@ export const InstanceValidator = () => {
           return value.length > 0;
         },
         'message': 'A name for this instance is required.',
-      }
+      },
+      {
+        'validate': ({ value }) => {
+          return !illegal.test(value);
+        },
+        'message': 'The for name this instance should consist of letters and numbers.',
+      },
     ],
     'url': [
       {
