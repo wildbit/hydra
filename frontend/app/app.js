@@ -49,6 +49,9 @@ if (module.hot) {
   });
   render();
 }
+else {
+  render();
+}
 
 
 // Install ServiceWorker and AppCache in the end since
