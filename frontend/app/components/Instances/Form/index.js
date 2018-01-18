@@ -17,6 +17,7 @@ import Body from 'components/Modal/Body';
 import Footer from 'components/Modal/Footer';
 import { branch, compose, withState, withHandlers, renderNothing } from 'recompose';
 import { InstanceValidator } from 'utils/validators/Instance';
+import { IllegalUrlCharacters as illegal, Protocol as protocol } from 'utils/regular-expressions';
 
 const defaultState = ({ name = '', url = '', username = '', password = '', errors = {} } = {}) => {
   return {
@@ -108,10 +109,9 @@ export default class Form extends React.Component {
     }
 
     let { name, url } = this.state;
-    const protocol = /^http(s)?:\/\//i;
 
     if (protocol.test(url)) {
-      name = url.replace(protocol, '');
+      name = url.replace(protocol, '').replace(illegal, '-');
 
       this.setState({ name }, () => {
         if (name.length > 0) {
