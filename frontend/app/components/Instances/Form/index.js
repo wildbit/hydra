@@ -8,6 +8,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import reactTriggerChange from 'react-trigger-change';
 
 import Modal from 'components/Modal';
 import Header from 'components/Modal/Header';
@@ -35,6 +36,7 @@ export default class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = defaultState();
+    this._name = null;
   }
 
   componentDidMount() {
@@ -98,6 +100,27 @@ export default class Form extends React.Component {
     this.setState(state);
   }
 
+  handleOnUrlChange = (event) => {
+    this.handleOnChange(event);
+
+    if (this.props.current) {
+      return;
+    }
+
+    let { name, url } = this.state;
+    const protocol = /^http(s)?:\/\//i;
+
+    if (protocol.test(url)) {
+      name = url.replace(protocol, '');
+
+      this.setState({ name }, () => {
+        if (name.length > 0) {
+          reactTriggerChange(this._name);
+        }
+      });
+    }
+  }
+
   handleOnSubmit = (event) => {
     event.preventDefault();
 
@@ -118,7 +141,6 @@ export default class Form extends React.Component {
     }
 
     onSubmit(state, () => {
-      this.setState(defaultState());
       $(ReactDOM.findDOMNode(this)).modal('hide');
     });
   }
@@ -135,17 +157,6 @@ export default class Form extends React.Component {
           </Header>
           <Body>
             <div className="form-group">
-              <label htmlFor="Name">Name</label>
-              <input
-                type="text"
-                className={`form-control ${(errors.name || []).length > 0 ? 'is-invalid' : ''}`}
-                placeholder="production-proxy-01"
-                value={name}
-                data-field="name"
-                onChange={this.handleOnChange} />
-              <Errors errors={errors.name} />
-            </div>
-            <div className="form-group">
               <label htmlFor="Url">Url</label>
               <input
                 type="text"
@@ -153,8 +164,20 @@ export default class Form extends React.Component {
                 placeholder="http://localhost:10000"
                 data-field="url"
                 value={url}
-                onChange={this.handleOnChange} />
+                onChange={this.handleOnUrlChange} />
               <Errors errors={errors.url} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Name">Name</label>
+              <input
+                type="text"
+                className={`form-control ${(errors.name || []).length > 0 ? 'is-invalid' : ''}`}
+                placeholder="production-proxy-01"
+                value={name}
+                ref={(input) => { this._name = input; }}
+                data-field="name"
+                onChange={this.handleOnChange} />
+              <Errors errors={errors.name} />
             </div>
             <div className="form-group">
               <label htmlFor="Username">Username</label>
