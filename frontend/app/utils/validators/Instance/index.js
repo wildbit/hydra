@@ -6,14 +6,11 @@ export const InstanceValidator = () => {
       {
         'validate': ({ current, value }) => {
           const unique = (x) => x.display_name.toLowerCase() === value.toLowerCase();
+          let { display_name } = (current || {});
 
-          if (current) {
-            return Store.instance.List()
-              .filter(x => x.display_name !== current.display_name)
-              .filter(unique).length === 0
-          }
-
-          return Store.instance.List().filter(unique).length === 0;
+          return Store.instance.List()
+            .filter(x => x.display_name !== display_name)
+            .filter(unique).length === 0
         },
         'message': 'The name for instance must be unique.',
       },
