@@ -16,14 +16,14 @@ import { Switch, Route } from 'react-router-dom';
 
 import About from 'components/About';
 import Home from 'containers/HomePage';
-import NotFound from 'containers/NotFoundPage/Loadable';
+import NotFound from 'containers/NotFoundPage';
 
 export default function App() {
   return (
     <Switch>
       <Route exact path="/" component={Home} />
       <Route exact path="/about" component={About} />
-      <Route path="/:key" component={Home} />
+      <Route path="/ha-proxy/:key" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );

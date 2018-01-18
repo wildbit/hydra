@@ -8,11 +8,12 @@
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { HashRouter as Router } from 'react-router-dom';
+import createHistory from 'history/createBrowserHistory';
 import 'sanitize.css/sanitize.css';
 
 // Import root app
 import App from 'containers/App';
-import { BrowserRouter } from 'react-router-dom'
 
 // Load the favicon, the manifest.json file and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
@@ -34,10 +35,16 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'rc-slider/assets/index.css';
 import './global-styles';
 
+const history = createHistory();
 const MOUNT_NODE = document.getElementById('app');
 
 const render = () => {
-  ReactDOM.render(<BrowserRouter><App /></BrowserRouter>,MOUNT_NODE);
+  ReactDOM.render(
+    <Router history={history}>
+      <App />
+    </Router>,
+    MOUNT_NODE
+  );
 };
 
 if (module.hot) {
@@ -49,7 +56,6 @@ if (module.hot) {
   });
   render();
 }
-
 
 // Install ServiceWorker and AppCache in the end since
 // it's not most important operation and if main code fails,

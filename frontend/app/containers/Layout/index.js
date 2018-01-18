@@ -1,6 +1,6 @@
 /**
  *
- * LayoutWithState
+ * Layout
  *
  */
 
@@ -39,14 +39,14 @@ export default class Layout extends React.Component { // eslint-disable-line rea
   }
 
   refresh = (instances) => {
-    this.setState({ instances: instances }, ()  => {
-      this.setCurrent();
+    this.setState({ instances }, ()  => {
+      this.setCurrent(this.props);
     });
   }
 
-  setCurrent = (nextProps) => {
+  setCurrent = (props) => {
     let { instances }  = this.state;
-    let { params } = (nextProps || this.props).match;
+    let { params } = props.match;
     let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
 
     this.setState({ current });

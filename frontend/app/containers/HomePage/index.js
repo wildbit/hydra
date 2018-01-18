@@ -53,10 +53,10 @@ export default class HomePage extends React.Component { // eslint-disable-line r
 
   setCurrent = (props) => {
     let { instances, redirect }  = this.state;
-    let { params } = props.match;
+    let { params, url } = props.match;
     let current = (!params.key) ? instances[0] : instances.find(i => i.display_name === params.key)
 
-    if (redirect && redirect.pathname.indexOf(params.key) !== -1) {
+    if (redirect) {
       redirect = null;
     }
 
@@ -89,7 +89,7 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     let updated = Store.instance.Update(current, instance.url, instance.name, instance.username, instance.password);
 
     if (updated) {
-      this.setState({ redirect: { pathname: `/${instance.name}` } });
+      this.setState({ redirect: { pathname: `/ha-proxy/${instance.name}` } });
       callback();
     }
   }
