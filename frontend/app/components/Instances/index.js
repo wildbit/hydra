@@ -16,8 +16,7 @@ const Instance = (haProxy) => {
 
   return (
     <li className="nav-item">
-      <Link className={`nav-link instance-item ${haProxy.isCurrent ? 'disabled' : ''}`}
-        to={`/${haProxy.display_name}`}>
+      <Link className={`nav-link instance-item ${haProxy.isCurrent ? 'disabled' : ''}`} to={`/ha-proxy/${haProxy.display_name}`}>
         <Connection {...haProxy} />
         <span>{haProxy.display_name}</span>
         &nbsp;<Pending {...haProxy} />
