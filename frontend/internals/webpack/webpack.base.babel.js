@@ -5,6 +5,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const gitRevisionPlugin = new GitRevisionPlugin();
 
 // Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
 // 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
@@ -100,6 +102,8 @@ module.exports = (options) => ({
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+        GIT_VERSION: JSON.stringify(gitRevisionPlugin.version()),
+        GIT_COMMIT: JSON.stringify(gitRevisionPlugin.commithash()),
       },
     }),
     new webpack.NamedModulesPlugin(),
@@ -107,6 +111,7 @@ module.exports = (options) => ({
       from: '../backend/config/instance_manager.lua',
       to: 'public'
     }]),
+    new GitRevisionPlugin(),
   ]),
   resolve: {
     modules: ['app', 'node_modules'],

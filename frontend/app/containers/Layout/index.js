@@ -13,6 +13,7 @@ import Sidebar from 'components/Menu/Sidebar';
 import View from 'components/View';
 import Instances from 'components/Instances';
 import Form from 'components/Instances/Form'
+import GithubCommit from 'components/GithubCommit';
 import { Link } from 'react-router-dom';
 import { Icon } from 'components/Icon';
 
@@ -91,6 +92,9 @@ export default class Layout extends React.Component { // eslint-disable-line rea
               {children}
               <footer className="text-muted small text-center">
                 &copy; Wildbit, LLC { new Date().getFullYear() }
+                <span className="pull-right">
+                  <GithubCommit {...process.env} />
+                </span>
               </footer>
             </View>
             <Form

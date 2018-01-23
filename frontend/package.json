@@ -1,10 +1,10 @@
 {
-  "name": "react-boilerplate",
-  "version": "3.5.0",
-  "description": "A highly scalable, offline-first foundation with the best DX and a focus on performance and best practices",
+  "name": "hydra",
+  "version": "0.0.1",
+  "description": "hydra",
   "repository": {
     "type": "git",
-    "url": "git://github.com/react-boilerplate/react-boilerplate.git"
+    "url": "git://github.com/wildbit/hydra.git"
   },
   "engines": {
     "npm": ">=3",
@@ -92,7 +92,6 @@
       "es6": true
     },
     "plugins": [
-      "redux-saga",
       "react",
       "jsx-a11y"
     ],
@@ -155,8 +154,6 @@
       "react/require-default-props": 0,
       "react/require-extension": 0,
       "react/self-closing-comp": 0,
-      "redux-saga/no-yield-in-race": 2,
-      "redux-saga/yield-effects": 2,
       "require-yield": 0
     },
     "settings": {
@@ -239,7 +236,6 @@
     "react-helmet": "5.1.3",
     "react-router-dom": "4.1.1",
     "recompose": "^0.26.0",
-    "redux": "3.6.0",
     "sanitize.css": "4.1.0",
     "styled-components": "2.0.0",
     "typescript": "^2.6.2",
@@ -281,6 +277,7 @@
     "eventsource-polyfill": "0.9.6",
     "exports-loader": "0.6.4",
     "file-loader": "0.11.1",
+    "git-revision-webpack-plugin": "^2.5.1",
     "html-loader": "0.4.5",
     "html-webpack-plugin": "2.29.0",
     "image-webpack-loader": "2.0.0",
