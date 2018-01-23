@@ -148,20 +148,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
     );
   }
 
-  renderNullCurrentInstance = () => {
-    let { current } = this.state;
-
-    if (current)  {
-      return null;
-    }
-
-    return (
-      <div className="text-center">
-        To view details, select one of the instances from the sidebar.
-      </div>
-    );
-  }
-
   renderUnavailableInstance = () => {
     let { current } = this.state;
 
@@ -247,7 +233,6 @@ export default class HomePage extends React.Component { // eslint-disable-line r
       <Layout {...this.props} hideSidebar={instances.length === 0}>
         {this.renderRedirect()}
         {this.renderEmptyInstances()}
-        {this.renderNullCurrentInstance()}
         {this.renderProxies()}
       </Layout>
     );
